@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\FrontEndController;
 use App\Http\Controllers\PharmacistController;
 use App\Http\Controllers\UserController;
 
@@ -25,9 +26,7 @@ Route::get('/', function () {
 
 Route::get('/backRoute', [AuthController::class, 'loadLogin']);
 
-Route::get('/index',function(){
-    return view('index');
-});
+Route::get('/index',[FrontEndController::class,'index']);
 
 //login-logout
 Route::get('/register',[AuthController::class,'loadRegister']);
@@ -61,8 +60,22 @@ Route::group(['prefix' => '_admin', 'middleware' => ['web', 'isAdmin']], functio
     Route::get('/roles', [AdminController::class, 'roles']);
     Route::post('/edit_roles/{id}', [AdminController::class, 'edit_roles']);
 
-    //doctors
-    
+    //blocks
+    Route::get('/blocks', [AdminController::class, 'blocks']);
+    Route::get('/add_blocks', [AdminController::class, function (){
+        return view('control.admin.add_blocks');
+    }]);
+    Route::post('/add_blocks', [AdminController::class, 'add_blocks']);
+    Route::get('/edit_blocks/{id}', [AdminController::class,'edit_blocks']);
+    Route::post('/edit_blocks/{id}', [AdminController::class,'update_blocks']);
+    Route::get('/delete_blocks/{id}', [AdminController::class,'delete_blocks']);
+
+    //departments
+    Route::get('/departments', [AdminController::class, 'departments']);
+    Route::get('/show_departments',[AdminController::class, 'show_departments']);
+    Route::post('/add_departments',[AdminController::class, 'add_departments']);
+    Route::get('/edit_departments/{id}',[AdminController::class,'edit_departments']);
+    Route::post('/edit_departments/{id}',[AdminController::class,'update_departments']);
 });
 
 //Pharmacist

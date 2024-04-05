@@ -206,4 +206,5 @@ class AuthController extends Controller
         $user->save();
         return redirect('/backRoute')->with('success', 'Password has been reset.');
     }
+
 }

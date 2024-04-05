@@ -23,6 +23,18 @@
         </a>
       </li>
       <li class="nav-item">
+        <a class="nav-link @if(Request::segment(2)=='blocks') @else collapsed @endif" href="{{url('/_admin/blocks')}}">
+          <i class="bi bi-building"></i>
+          <span>Blocks</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link @if(Request::segment(2)=='departments') @else collapsed @endif" href="{{url('/_admin/departments')}}">
+          <i class="bi bi-file-medical"></i>
+          <span>Departments</span>
+        </a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link @if(Request::segment(2)=='doctors') @else collapsed @endif" href="{{url('/_admin/doctors')}}">
           <i class="bi bi-person-fill-check"></i>
           <span>Doctors</span>
