@@ -76,6 +76,13 @@ Route::group(['prefix' => '_admin', 'middleware' => ['web', 'isAdmin']], functio
     Route::post('/add_departments',[AdminController::class, 'add_departments']);
     Route::get('/edit_departments/{id}',[AdminController::class,'edit_departments']);
     Route::post('/edit_departments/{id}',[AdminController::class,'update_departments']);
+    Route::get('/delete_departments/{id}',[AdminController::class,'delete_departments']);
+
+    //doctors
+    Route::get('/doctors',[AdminController::class, 'doctors']);
+    
+    Route::post('/add_doctors',[AdminController::class, 'add_doctors']);
+    Route::get('/delete_doctors/{id}',[AdminController::class, 'delete_doctors']);
 });
 
 //Pharmacist

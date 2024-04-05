@@ -37,6 +37,7 @@
                                     <td>{{$item->description}}</td>
                                     <td>
                                         <a href="{{url('_admin/edit_departments/'.$item->id)}}" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
+                                         
                                         <a href="{{url('_admin/delete_departments/'.$item->id)}}" onclick="return confirm('Are you sure that you want to delete?')"  class="btn btn-danger"><i class="bi bi-trash"></i></a>
                                     </td>
                                 </tr>

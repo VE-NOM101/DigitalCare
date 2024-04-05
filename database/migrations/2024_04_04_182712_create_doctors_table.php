@@ -15,17 +15,18 @@ class CreateDoctorsTable extends Migration
     {
         Schema::create('doctors', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('department_id');
+            $table->unsignedBigInteger('user_id')->default(1);
+            $table->unsignedBigInteger('department_id')->default(0);
             $table->string('name');
-            $table->string('email');
+            $table->string('email')->unique();
             $table->foreign('department_id')->references('id')->on('departments')->onDelete('cascade');
-            $table->string('phone');
-            $table->string('qualification');
-            $table->string('designation');
-            $table->string('specialist');
-            $table->string('gender');
-            $table->string('picture');
-            $table->string('address');
+            $table->string('phone')->nullable();
+            $table->string('qualification')->nullable();
+            $table->string('designation')->nullable();
+            $table->string('specialist')->nullable();
+            $table->string('gender')->nullable();
+            $table->string('photo_path')->nullable();
+            $table->string('address')->nullable();
             $table->timestamps();
         });
     }

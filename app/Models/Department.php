@@ -11,4 +11,8 @@ class Department extends Model
     public function blocks(){
         return $this->belongsTo(Block::class,'block_id','id');
     }
+
+    public function doctors(){
+        return $this->hasMany(Department::class,'department_id','id');
+    }
 }
