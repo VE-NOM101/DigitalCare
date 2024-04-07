@@ -2,12 +2,13 @@
   <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
-      <a href="index.html" class="logo d-flex align-items-center">
+      <a href="{{url('/backRoute')}}" class="logo d-flex align-items-center">
         <img src="{{config('app.url')}}/Admin/assets/img/logo.png" alt="">
         <span class="d-none d-lg-block">@if(Auth::user()->role==1){{'User'}}
             @elseif(Auth::user()->role==2){{'Doctor'}}
             @elseif(Auth::user()->role==3){{'Pharmacist'}}
             @elseif(Auth::user()->role==4){{'Admin'}}
+            @elseif(Auth::user()->role==5){{'Nurse'}}
             @endif</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>

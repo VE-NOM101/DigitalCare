@@ -331,7 +331,7 @@
                 <div class="col-lg-12">
                     <div class="title-box">
                         <h2>Appointment</h2>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. </p>
+                        <p>Any medical concerns or issues?</p>
                     </div>
                 </div>
             </div>
@@ -341,83 +341,92 @@
                         <div class="well-title">
                             <h2>Book an Appointment</h2>
                         </div>
-                        <form>
-                            <!-- Form start -->
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="control-label" for="name">Name</label>
-                                        <input id="name" name="name" type="text" placeholder="Name"
-                                            class="form-control input-md">
+                        @include('auth.error')
+                        @include('auth.message')
+                        @if (Auth::user())
+                            <form action="{{ url('/request_appointment') }}" method="POST">
+                                @csrf
+                                <!-- Form start -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="name">Name</label>
+                                            <input id="name" name="name" type="text"
+                                                placeholder="{{ Auth::user()->name }}" value="{{ Auth::user()->name }}" disabled
+                                                class="form-control input-md">
+                                        </div>
+                                    </div>
+                                    <!-- Text input-->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="email">Email</label>
+                                            <input id="email" name="email" type="email"
+                                                placeholder="{{ Auth::user()->email }}" value="{{ Auth::user()->email }}" disabled
+                                                class="form-control input-md">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="phone">Phone</label>
+                                            <input id="phone" name="phone" type="text" placeholder="Phone"
+                                                class="form-control input-md">
+                                        </div>
+                                    </div>
+                                    <!-- Text input-->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="date">Preferred Date</label>
+                                            <input id="date" name="preferred_date" type="date"
+                                                class="form-control input-md">
+                                        </div>
+                                    </div>
+                                    <!-- Select Basic -->
+                                    {{-- <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="time">Preferred Time</label>
+                                            <input id="time" name="preferred_time" type="time"
+                                                class="form-control input-md">
+                                        </div>
+                                    </div> --}}
+                                    <!-- Select Basic -->
+
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label class="control-label" for="doctorlist">Doctor</label>
+                                            <select id="doctorlist" name="doctor_id" class="form-control">
+                                                <option value="{{ $getDoctor->first()->id }}">
+                                                    {{ $getDoctor->first()->name . ' ( ' . $getDepartment->find($getDoctor->first()->department_id)->name . ' )' }}
+                                                </option>
+                                                @foreach ($getDoctor as $item)
+                                                    @if ($item->id != $getDoctor->first()->id)
+                                                        <option value="{{ $item->id }}">
+                                                            {{ $item->name . ' ( ' . $getDepartment->find($item->department_id)->name . ' )' }}
+                                                        </option>
+                                                    @endif
+                                                @endforeach
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label class="control-label" for="time">Description</label>
+                                            <textarea name="description" class="form-control" id="about" style="height: 100px"></textarea>
+                                        </div>
+                                    </div>
+                                    <!-- Button -->
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <button id="singlebutton" name="singlebutton" class="new-btn-d br-2">Make An Appointment</button>
+                                        </div>
                                     </div>
                                 </div>
-                                <!-- Text input-->
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="control-label" for="email">Email</label>
-                                        <input id="email" name="email" type="email" placeholder="E-Mail"
-                                            class="form-control input-md">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="control-label" for="phone">Phone</label>
-                                        <input id="phone" name="phone" type="text" placeholder="Phone"
-                                            class="form-control input-md">
-                                    </div>
-                                </div>
-                                <!-- Text input-->
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="control-label" for="date">Preferred Date</label>
-                                        <input id="date" name="date" type="date"
-                                            class="form-control input-md">
-                                    </div>
-                                </div>
-                                <!-- Select Basic -->
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="control-label" for="time">Preferred Time</label>
-                                        <input id="time" name="time" type="time"
-                                            class="form-control input-md">
-                                    </div>
-                                </div>
-                                <!-- Select Basic -->
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label class="control-label" for="appointmentfor">Department</label>
-                                        <select id="appointmentfor" name="appointmentfor" class="form-control">
-                                            <option value="Choose Department">Choose Department</option>
-                                            <option value="Gynacology">Gynacology</option>
-                                            <option value="Dermatologist">Dermatologist</option>
-                                            <option value="Orthology">Orthology</option>
-                                            <option value="Anesthesiology">Anesthesiology</option>
-                                            <option value="Ayurvedic">Ayurvedic</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label class="control-label" for="doctorlist">Department</label>
-                                        <select id="doctorlist" name="doctorlis" class="form-control">
-                                            <option value="Choose Department">Choose Department</option>
-                                            <option value="Gynacology">Gynacology</option>
-                                            <option value="Dermatologist">Dermatologist</option>
-                                            <option value="Orthology">Orthology</option>
-                                            <option value="Anesthesiology">Anesthesiology</option>
-                                            <option value="Ayurvedic">Ayurvedic</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <!-- Button -->
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <button id="singlebutton" name="singlebutton" class="new-btn-d br-2">Make An
-                                            Appointment</button>
-                                    </div>
-                                </div>
+                            </form>
+                            @else
+                            <div style="font-size:1.5rem;" class="alert alert-warning alert-dismissible fade show" role="alert">
+                                Please login first
                             </div>
-                        </form>
+                        @endif
                         <!-- form end -->
                     </div>
                 </div>
@@ -474,18 +483,22 @@
                         @foreach ($getDepartment as $item)
                             <div class="item">
                                 <div class="serviceBox">
-                                    <div class="service-icon"><img style="border-radius: 50%; width:80px; height:80px;" src="{{asset('digitalcare/admin/departments/'.$item->photo_path)}}" alt="{{$item->photo_path}}"/></i></div>
-                                    <h3 class="title">{{$item->name}}</h3>
+                                    <div class="service-icon"><img
+                                            style="border-radius: 50%; width:80px; height:80px;"
+                                            src="{{ asset('digitalcare/admin/departments/' . $item->photo_path) }}"
+                                            alt="{{ $item->photo_path }}" /></i></div>
+                                    <h3 class="title">{{ $item->name }}</h3>
                                     <div style="height: 300px; overflow-y: auto;">
                                         <p class="description">
-                                            {{$item->description}}
+                                            {{ $item->description }}
                                         </p>
                                     </div>
-                                    
-                                    <a href="https://www.kokilabenhospital.com/departments/clinical.html" class="new-btn-d br-2">Read More</a>
+
+                                    <a href="https://www.kokilabenhospital.com/departments/clinical.html"
+                                        class="new-btn-d br-2">Read More</a>
                                 </div>
                             </div>
-                      @endforeach
+                        @endforeach
 
                     </div>
                 </div>
@@ -614,71 +627,38 @@
                 <div class="col-lg-12">
                     <div class="title-box">
                         <h2>Our Doctor</h2>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. </p>
+                        <p>Meet the best, Get treatment from expert.</p>
                     </div>
                 </div>
             </div>
-
             <div class="row">
-                <div class="col-md-4 col-sm-6">
-                    <div class="our-team">
-                        <div class="pic">
-                            <img src="{{ config('app.url') }}/Frontend/images/img-1.jpg" alt="">
-                        </div>
-                        <div class="team-content">
-                            <h3 class="title">Williamson</h3>
-                            <span class="post">web developer</span>
-                            <ul class="social">
-                                <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
-                                <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
-                                <li><a href="#"><i class="fa fa-google-plus" aria-hidden="true"></i></a></li>
-                                <li><a href="#"><i class="fa fa-youtube-play" aria-hidden="true"></i></a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 col-sm-6">
-                    <div class="our-team">
-                        <div class="pic">
-                            <img src="{{ config('app.url') }}/Frontend/images/img-2.jpg" alt="">
-                        </div>
-                        <div class="team-content">
-                            <h3 class="title">kristina</h3>
-                            <span class="post">Web Designer</span>
-                            <ul class="social">
-                                <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
-                                <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
-                                <li><a href="#"><i class="fa fa-google-plus" aria-hidden="true"></i></a></li>
-                                <li><a href="#"><i class="fa fa-youtube-play" aria-hidden="true"></i></a></li>
-                            </ul>
+                @foreach ($getDoctor as $item)
+                    <div class="col-md-4 col-sm-6">
+                        <div class="our-team">
+                            <div class="pic">
+                                <img style="max-height: 400px;"
+                                    src="@if ($item->photo_path) {{ asset('digitalcare/doctors/profile/' . $item->photo_path) }} @else{{ asset('digitalcare/doctors/profile/img-1.jpg') }} @endif"
+                                    alt="Photo">
+                            </div>
+                            <div class="team-content">
+                                <h3 class="title">{{ $item->name }}</h3>
+                                <span class="post">{{ $getDepartment->find($item->department_id)->name }}</span>
+                                <ul class="social">
+                                    <li><a href="{{ $item->facebook }}"><i class="fa fa-facebook"
+                                                aria-hidden="true"></i></a></li>
+                                    <li><a href="{{ $item->linkedin }}"><i class="fa fa-linkedin"
+                                                aria-hidden="true"></i></a></li>
+                                    <li><a href="mailto:{{ $item->email }}"><i class="fa fa-envelope"
+                                                aria-hidden="true"></i></a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="col-md-4 col-sm-6">
-                    <div class="our-team">
-                        <div class="pic">
-                            <img src="{{ config('app.url') }}/Frontend/images/img-3.jpg" alt="">
-                        </div>
-                        <div class="team-content">
-                            <h3 class="title">Steve Thomas</h3>
-                            <span class="post">web developer</span>
-                            <ul class="social">
-                                <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
-                                <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
-                                <li><a href="#"><i class="fa fa-google-plus" aria-hidden="true"></i></a></li>
-                                <li><a href="#"><i class="fa fa-youtube-play" aria-hidden="true"></i></a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-
-
+                @endforeach
             </div>
-
         </div>
+
+    </div>
     </div>
 
     <!-- End Team -->

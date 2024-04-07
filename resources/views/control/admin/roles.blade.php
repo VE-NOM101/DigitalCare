@@ -53,6 +53,12 @@
                                                 </div>
                                                 <div class="form-check">
                                                     <input name="role" class="form-check-input role-checkbox"
+                                                        type="radio" value="5"
+                                                        {{ $item->role == 5 ? 'checked' : '' }}>
+                                                    <label class="form-check-label">Nurse</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input name="role" class="form-check-input role-checkbox"
                                                         type="radio" value="1"
                                                         {{ $item->role == 1 ? 'checked' : '' }}>
                                                     <label class="form-check-label">User</label>

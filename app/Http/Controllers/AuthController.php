@@ -122,16 +122,7 @@ class AuthController extends Controller
         return 'login_throttle_' . Str::lower($request->input('email')) . '|' . $request->ip();
     }
 
-
-
-
-
-
-
     //
-
-
-
     public function redirectDash()
     {
         $redirect = '';
@@ -144,7 +135,9 @@ class AuthController extends Controller
             $redirect = '/_pharmacist/dashboard';
         } else if (Auth::user() && Auth::user()->role == 4) {
             $redirect = '/_admin/dashboard';
-        } else {
+        } else if (Auth::user() && Auth::user()->role == 5) {
+            $redirect = '/_nurse/dashboard';
+        }else {
             $redirect = '/index';
         }
 

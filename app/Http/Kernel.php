@@ -70,6 +70,7 @@ class Kernel extends HttpKernel
         'isPharmacist' => \App\Http\Middleware\PharmacistAuth::class,
         'isDoctor' => \App\Http\Middleware\DoctorAuth::class,
         'isUser' => \App\Http\Middleware\UserAuth::class,
+        'isNurse' => \App\Http\Middleware\NurseAuth::class,
 
         // //limiter
         // 'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,

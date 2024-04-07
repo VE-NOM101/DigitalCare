@@ -26,7 +26,11 @@ class CreateDoctorsTable extends Migration
             $table->string('specialist')->nullable();
             $table->string('gender')->nullable();
             $table->string('photo_path')->nullable();
+            $table->string('facebook')->nullable();
+            $table->string('linkedin')->nullable();
             $table->string('address')->nullable();
+            $table->time('checkout_time1')->nullable();
+            $table->time('checkout_time2')->nullable();
             $table->timestamps();
         });
     }

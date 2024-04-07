@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Models\Doctor;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class FrontEndController extends Controller
@@ -12,7 +14,8 @@ class FrontEndController extends Controller
     //index function
 
     public function index(){
-        $departments['getDepartment'] = Department::get();
-        return view('index',$departments);
+        $data['getDepartment'] = Department::get();
+        $data['getDoctor'] = Doctor::get();
+        return view('index',$data);
     }
 }

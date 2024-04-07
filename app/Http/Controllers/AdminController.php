@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Block;
 use App\Models\Department;
 use App\Models\Doctor;
+use App\Models\Nurse;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
@@ -57,7 +58,6 @@ class AdminController extends Controller
         $user = User::find($id);
         $user->role = $request->role;
         $user->save();
-
         return redirect('/_admin/roles')->with('success', 'User role updated successfully');
     }
 
@@ -214,5 +214,34 @@ class AdminController extends Controller
         $doctor = Doctor::find($id);
         $doctor->delete();
         return redirect('/_admin/doctors')->with('success','Doctor deleted successfully');
+    }
+
+    //nurses
+    public function nurses(){
+        $nurses['getNurse'] = User::where('role', 5)->get();
+        $nurses['getRecord'] = Nurse::get();
+        return view('control.admin.nurses',$nurses);
+    }
+    public function add_nurses(Request $request)
+    {
+        $nurse = new Nurse;
+        $user = User::find($request->input('user_id'));
+        $check = $nurse->where('email', '=', $user->email)->first();
+        if ($check) {
+
+            return redirect('/_admin/nurses')->with('error', 'Nurse already exists');
+        }
+
+        $nurse->user_id = $request->input('user_id');
+        $nurse->name = $user->name;
+        $nurse->email = $user->email;
+        $nurse->address = $user->address;
+        $nurse->save();
+        return redirect('/_admin/nurses')->with('success', 'Nurse added successfully');
+    }
+    public function delete_nurses($id){
+        $nurse = Nurse::find($id);
+        $nurse->delete();
+        return redirect('/_admin/nurses')->with('success','Doctor deleted successfully');
     }
 }
