@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ApprovedAppointment;
+use App\Models\DaySchedule;
 use App\Models\Department;
 use App\Models\Doctor;
+use App\Models\Nurse;
 use App\Models\RequestedAppointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +17,7 @@ use Illuminate\Validation\Rules\Exists;
 use App\Rules\FutureDateTime;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class DoctorController extends Controller
 {
@@ -106,15 +110,154 @@ class DoctorController extends Controller
         }
     }
 
-    
 
-    public function appointments(){
-        $data['getRA'] = RequestedAppointment::where('isApproved',0)->get();
-        return view('control.doctor.appointments',$data);
+
+    //schedule
+
+    public function schedule()
+    {
+        $user_id = Auth::user()->id;
+        $doctor_id = Doctor::where('user_id', $user_id)->first();
+        if ($doctor_id) {
+            $doctor_id = $doctor_id->id;
+            $schedule['getSchedule'] = DaySchedule::where('doctor_id', $doctor_id)->first();
+            return view('control.doctor.schedule', $schedule);
+        } else {
+            return redirect('/_doctor/dashboard')->with('error', 'Doctor yet not registered by admin');
+        }
     }
 
-    public function approve_appointment($id){
-        $req_appointment = RequestedAppointment ::find($id);
+    public function update_schedule($id, Request $request)
+    {
 
+        $request->validate([
+            'per_patient_time' => 'required|string|max:2'
+        ]);
+        $schedule = DaySchedule::find($id);
+        $schedule->monday1 = $request->monday1;
+        $schedule->monday2 = $request->monday2;
+        $schedule->tuesday1 = $request->tuesday1;
+        $schedule->tuesday2 = $request->tuesday2;
+        $schedule->wednesday1 = $request->wednesday1;
+        $schedule->wednesday2 = $request->wednesday2;
+        $schedule->thursday1 = $request->thursday1;
+        $schedule->thursday2 = $request->thursday2;
+        $schedule->friday1 = $request->friday1;
+        $schedule->friday2 = $request->friday2;
+        $schedule->saturday1 = $request->saturday1;
+        $schedule->saturday2 = $request->saturday2;
+        $schedule->sunday1 = $request->sunday1;
+        $schedule->sunday2 = $request->sunday2;
+
+        $schedule->per_patient_time = $request->per_patient_time;
+        $schedule->save();
+
+        return redirect('/_doctor/schedule')->with('success', 'Schedule Updated Successfully');
+    }
+
+    public function fetchAvailableSlots($doctor_id, $preferred_date)
+    {
+        $preferred_date = Carbon::parse($preferred_date);
+        $all_approves = ApprovedAppointment::all();
+        $times = collect(); // Initialize as a collection
+
+        // Retrieve all approved appointments for the specified doctor and preferred date
+        $all_requests = RequestedAppointment::where('doctor_id', $doctor_id)
+            ->where('preferred_date', $preferred_date)
+            ->where('isApproved', 1)
+            ->get();
+
+        // Extract intime from approved appointments and store in $times collection
+        foreach ($all_requests as $request) {
+            $slotTime = $all_approves->where('request_id', $request->id)->first()->slotTime;
+            $times->push($slotTime);
+        }
+
+        // Now you have all booked slots in $times collection
+        // You can calculate further available slots based on doctor's schedule
+
+        // Get the doctor's schedule for that specific day
+        $schedule = DaySchedule::where('doctor_id', $doctor_id)->first();
+
+        // Assuming each appointment duration is in minutes
+        $appointmentDuration = $schedule->per_patient_time;
+
+        // Initialize available slots array
+        $availableSlots = collect();
+
+        // Get the start and end times for the doctor's availability on that day
+        $startTimeColumn = strtolower($preferred_date->englishDayOfWeek) . '1';
+        $endTimeColumn = strtolower($preferred_date->englishDayOfWeek) . '2';
+
+        $startTime = Carbon::parse($schedule->$startTimeColumn);
+        $endTime = Carbon::parse($schedule->$endTimeColumn);
+
+        // Start from the beginning of the day until the end time
+        $currentTime = $startTime->copy();
+
+        // Loop through the doctor's available time slots
+        while ($currentTime->lte($endTime)) {
+            // Check if the current time slot is not in $times (booked slots)
+
+            if (!$times->contains($currentTime->toTimeString())) {
+                $availableSlots->push($currentTime->copy()->toTimeString());
+            }
+
+            // Move to the next time slot
+            $currentTime->addMinutes($appointmentDuration);
+        }
+
+        // Return the available slots
+        return $availableSlots;
+    }
+
+    //appointments
+
+    public function appointments()
+    {
+        if (Doctor::where('user_id', Auth::user()->id)->count() > 0) {
+            $doctor_id = Doctor::where('user_id', Auth::user()->id)->first()->id;
+            $allRequests = RequestedAppointment::where('isApproved', 0)->where('isConfirmed', 0)->where('doctor_id', $doctor_id)->get();
+            $allAvailableSlots = [];
+            foreach ($allRequests as $request) {
+                $slots = $this->fetchAvailableSlots($doctor_id, $request->preferred_date);
+                $allAvailableSlots[$request->id] = $slots;
+            }
+            $approved = RequestedAppointment::where('isApproved', 1)->where('doctor_id', $doctor_id)->get();
+            $approvedSlots = ApprovedAppointment::all();
+            $data['getRA'] = $allRequests;
+            $data['getAvailableSlots'] = $allAvailableSlots;
+            $data['getApproved'] = $approved;
+            $data['getApprovedSlots'] = $approvedSlots;
+
+            return view('control.doctor.appointments', $data);
+        }
+        return redirect('/_doctor/dashboard')->with('error', 'Doctor yet not registered by admin');
+    }
+
+    public function approve_appointment($id, Request $request)
+    {
+        $requested_appointment = RequestedAppointment::find($id);
+
+        $request->validate([
+            'slotTime' => 'required',
+        ]);
+
+        $approved_appointment = new ApprovedAppointment;
+        $approved_appointment->slotTime = $request->slotTime;
+        $approved_appointment->request_id = $id;
+        $requested_appointment->isApproved = 1;
+        $approved_appointment->save();
+        $requested_appointment->save();
+        return redirect('/_doctor/appointments')->with('success', 'Request Approved Successfully');
+    }
+
+    public function cancel_appointment($id)
+    {
+        $requested_appointment = RequestedAppointment::find($id);
+        $requested_appointment->isConfirmed = 2;
+        $requested_appointment->save();
+
+        return redirect('/_doctor/appointments')->with('warning', 'Appointment Canceled Successfully.');
     }
 }

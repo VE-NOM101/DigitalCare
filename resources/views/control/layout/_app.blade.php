@@ -69,6 +69,12 @@
     <!-- Template Main JS File -->
     <script src="{{ config('app.url') }}/Admin/assets/js/main.js"></script>
 
+    <script>
+        function submitForm(id) {
+          document.getElementById("appointment_form_"+id).submit();
+        }
+    </script>
+
 </body>
 
 </html>

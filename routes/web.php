@@ -8,6 +8,7 @@ use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\FrontEndController;
 use App\Http\Controllers\NurseController;
 use App\Http\Controllers\PharmacistController;
+use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\UserController;
 use App\Models\Doctor;
 
@@ -29,6 +30,7 @@ Route::get('/', function () {
 Route::get('/backRoute', [AuthController::class, 'loadLogin']);
 
 Route::get('/index', [FrontEndController::class, 'index']);
+
 
 //login-logout
 Route::get('/register', [AuthController::class, 'loadRegister']);
@@ -82,10 +84,12 @@ Route::group(['prefix' => '_admin', 'middleware' => ['web', 'isAdmin']], functio
 
     //doctors
     Route::get('/doctors', [AdminController::class, 'doctors']);
-
     Route::post('/add_doctors', [AdminController::class, 'add_doctors']);
     Route::get('/delete_doctors/{id}', [AdminController::class, 'delete_doctors']);
-
+    Route::get('/appointments', [AdminController::class, 'appointments']);
+    Route::get('/cancel_appointment/{id}',[AdminController::class,'cancel_appointment']);
+    Route::get('/confirm_appointment/{id}',[AdminController::class,'confirm_appointment']);
+    Route::post('/confirm_appointment/{approved_id}',[AdminController::class,'post_confirm_appointment']);
     //nurses
     Route::get('/nurses', [AdminController::class, 'nurses']);
     Route::post('/add_nurses', [AdminController::class, 'add_nurses']);
@@ -102,8 +106,13 @@ Route::group(['prefix' => '_doctor', 'middleware' => ['web', 'isDoctor']], funct
     Route::get('/profile', [DoctorController::class, 'profile']);
     Route::post('/edit_profile/{doctor_id}/{user_id}', [DoctorController::class, 'edit_profile']);
     Route::post('/change_password/{user_id}', [DoctorController::class, 'change_password']);
+   
+    Route::get('/schedule',[DoctorController::class,'schedule']);
+    Route::post('/update_schedule/{id}',[DoctorController::class,'update_schedule']);
+
     Route::get('/appointments', [DoctorController::class, 'appointments']);
-    Route::get('/approve_appointment/{id}', [DoctorController::class, 'approve_appointments']);
+    Route::post('/approve_appointment/{id}/', [DoctorController::class, 'approve_appointment']);
+    Route::get('/cancel_appointment/{id}',[DoctorController::class,'cancel_appointment']);
 });
 //Nurse
 Route::group(['prefix' => '_nurse', 'middleware' => ['web', 'isNurse']], function () {
@@ -115,6 +124,9 @@ Route::group(['prefix' => '_nurse', 'middleware' => ['web', 'isNurse']], functio
 //User
 Route::group(['prefix' => '_user', 'middleware' => ['web', 'isUser']], function () {
     Route::get('/dashboard', [UserController::class, 'dashboard']);
+    Route::get('/appointments',[UserController::class, 'appointments']);
+    Route::get('/resend_appointment/{id}',[UserController::class, 'resend_appointment']); 
+    Route::post('/post_resend_appointment/',[UserController::class, 'post_resend_appointment']);
 });
 
 

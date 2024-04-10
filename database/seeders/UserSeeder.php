@@ -21,6 +21,7 @@ class UserSeeder extends Seeder
                 ['name' => 'doctor'],
                 ['name' => 'pharmacist'],
                 ['name' => 'admin'],
+                ['name' => 'nurse'],
             ]);
         } else {
             // If roles exist, inform the user

@@ -14,7 +14,7 @@
                         <h5 class="card-title">Manager</h5>
                         {{-- <a href="" class="btn btn-primary">Add</a> --}}
                         <!-- Table with stripped rows -->
-                        <table class="table datatable">
+                        <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th scope="col">ID</th>
@@ -34,48 +34,48 @@
                                                 method="POST">
                                                 @csrf
                                                 <div class="form-check">
-                                                    <input name="role" class="form-check-input role-checkbox"
+                                                    <input id="admin" name="role" class="form-check-input role-checkbox" title="Admin" placeholder="Admin"
                                                         type="radio" value="4"
                                                         {{ $item->role == 4 ? 'checked' : '' }}>
-                                                    <label class="form-check-label">Admin</label>
+                                                    <label for="admin" class="form-check-label">Admin</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input name="role" class="form-check-input role-checkbox"
+                                                    <input id="doctor" name="role" class="form-check-input role-checkbox" title="Doctor" placeholder="Doctor"
                                                         type="radio" value="2"
                                                         {{ $item->role == 2 ? 'checked' : '' }}>
-                                                    <label class="form-check-label">Doctor</label>
+                                                    <label for="doctor" class="form-check-label">Doctor</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input name="role" class="form-check-input role-checkbox"
+                                                    <input id="pharmacist" name="role" class="form-check-input role-checkbox" title="Pharmacist" placeholder="Pharmacist"
                                                         type="radio" value="3"
                                                         {{ $item->role == 3 ? 'checked' : '' }}>
-                                                    <label class="form-check-label">Pharmacist</label>
+                                                    <label for="pharmacist" class="form-check-label">Pharmacist</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input name="role" class="form-check-input role-checkbox"
+                                                    <input id="nurse" name="role" class="form-check-input role-checkbox" title="Nurse" placeholder="Nurse"
                                                         type="radio" value="5"
                                                         {{ $item->role == 5 ? 'checked' : '' }}>
-                                                    <label class="form-check-label">Nurse</label>
+                                                    <label for="nurse" class="form-check-label">Nurse</label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input name="role" class="form-check-input role-checkbox"
+                                                    <input id="user" name="role" class="form-check-input role-checkbox" title="User" placeholder="User"
                                                         type="radio" value="1"
                                                         {{ $item->role == 1 ? 'checked' : '' }}>
-                                                    <label class="form-check-label">User</label>
+                                                    <label for="user" class="form-check-label">User</label>
                                                 </div>
 
                                                 <button type="submit" class="btn btn-outline-primary">Done<span>   </span><i class="bi bi-check-circle-fill"></i></button>
                                             </form>
+
                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                         <!-- End Table with stripped rows -->
-
+                        {{$getRecord->onEachSide(1)->links()}}
                     </div>
-                </div>
-
+                </div> 
             </div>
         </div>
     </section>

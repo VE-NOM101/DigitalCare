@@ -32,6 +32,13 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'appointments') @else collapsed @endif"
+                    href="{{ url('/_admin/appointments') }}">
+                    <i class="bi bi-person-lines-fill"></i>
+                    <span>Appointments</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link @if (Request::segment(2) == 'departments') @else collapsed @endif"
                     href="{{ url('/_admin/departments') }}">
                     <i class="bi bi-file-medical"></i>
@@ -63,6 +70,13 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'schedule') @else collapsed @endif"
+                    href="{{ url('/_doctor/schedule') }}">
+                    <i class="bi bi-calendar-date"></i>
+                    <span>Schedule</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link @if (Request::segment(2) == 'profile') @else collapsed @endif"
                     href="{{ url('/_doctor/profile') }}">
                     <i class="bi bi-person"></i>
@@ -70,12 +84,23 @@
                 </a>
             </li>
         @endif
+
+
         @if (Auth::user() && Auth::user()->role == 5)
             <li class="nav-item">
                 <a class="nav-link @if (Request::segment(2) == 'profile') @else collapsed @endif"
                     href="{{ url('/_nurse/profile') }}">
                     <i class="bi bi-person"></i>
                     <span>Profile</span>
+                </a>
+            </li>
+        @endif
+        @if (Auth::user() && Auth::user()->role == 1)
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'appointments') @else collapsed @endif"
+                    href="{{ url('/_user/appointments') }}">
+                    <i class="bi bi-person-lines-fill"></i>
+                    <span>Appointments</span>
                 </a>
             </li>
         @endif

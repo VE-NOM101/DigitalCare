@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ApprovedAppointment;
 use App\Models\Block;
+use App\Models\DaySchedule;
 use App\Models\Department;
 use App\Models\Doctor;
 use App\Models\Nurse;
+use App\Models\NurseAppointment;
+use App\Models\RequestedAppointment;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
@@ -49,7 +53,7 @@ class AdminController extends Controller
 
     public function roles()
     {
-        $data['getRecord']  = User::get();
+        $data['getRecord']  = User::paginate(5);
         return view('control.admin.roles', $data);
     }
 
@@ -202,17 +206,23 @@ class AdminController extends Controller
 
             return redirect('/_admin/doctors')->with('error', 'Doctor already exists');
         }
-
         $doctor->user_id = $request->input('user_id');
         $doctor->name = $user->name;
         $doctor->email = $user->email;
         $doctor->department_id = $request->input('department_id');
         $doctor->save();
+
+        //newly added for schedule
+        $schedule = new DaySchedule;
+        $schedule->doctor_id=$doctor->id;
+        $schedule->save(); 
         return redirect('/_admin/doctors')->with('success', 'Doctor added successfully');
     }
     public function delete_doctors($id){
         $doctor = Doctor::find($id);
         $doctor->delete();
+        //schedule code
+        $schedule = DaySchedule::where('doctor_id',$id)->delete();
         return redirect('/_admin/doctors')->with('success','Doctor deleted successfully');
     }
 
@@ -243,5 +253,57 @@ class AdminController extends Controller
         $nurse = Nurse::find($id);
         $nurse->delete();
         return redirect('/_admin/nurses')->with('success','Doctor deleted successfully');
+    }
+
+    //appointments
+
+    public function appointments(){
+        $data['getApproved'] = ApprovedAppointment::all();
+        $data['getRequest'] = RequestedAppointment::all();
+        $data['getDoctor'] = Doctor::all();
+        $data['getNurse'] = Nurse::all();
+        $data['getAppointedNurse'] = NurseAppointment::all();
+        return view('control.admin.appointments',$data);
+    }
+    public function cancel_appointment($id){
+        $approved_appointment = ApprovedAppointment::find($id);
+        $requested_appointment = RequestedAppointment::find($approved_appointment->request_id);
+        $approved_appointment->delete();
+        $requested_appointment->isConfirmed = 2;
+        $requested_appointment->save();
+        return redirect('/_admin/appointments')->with('warning','Appointment Canceled Successfully.');
+    }
+    public function confirm_appointment($id){
+        $approved_appointment = ApprovedAppointment::find($id);
+        $requested_appointment = RequestedAppointment::find($approved_appointment->request_id);
+        $appointed_nurse = NurseAppointment::where('appointed_date',$requested_appointment->preferred_date)->get();
+        $allNurse = Nurse::all();
+        $available_nurse_id = collect();
+        foreach($allNurse as $nurse){
+             $check = $appointed_nurse->where('nurse_id',$nurse->id)->count();
+             if($check<2){
+                 $available_nurse_id->push($nurse->id);
+             }
+        }
+        $data['getNurse'] = $allNurse;
+        $data['getAllNurseId'] = $available_nurse_id;
+        $data['getApprovedId'] = $id;
+        $data['getAppointedDate'] = $requested_appointment->preferred_date;
+
+        return view('control.admin.confirm_appointments',$data);
+    }
+    public function post_confirm_appointment($approved_id, Request $request){
+        $approved_appointment = ApprovedAppointment::find($approved_id);
+        $requested_appointment = RequestedAppointment::find($approved_appointment->request_id);
+        $newNurseAppointment = new NurseAppointment;
+        $newNurseAppointment->nurse_id = $request->nurse_id;
+        $newNurseAppointment->appointed_date = $requested_appointment->preferred_date;
+        $newNurseAppointment->save();
+        $approved_appointment->nurse_appointment_id = $newNurseAppointment->id;
+        $approved_appointment->save();
+        $requested_appointment->isConfirmed = 1;
+        $requested_appointment->save();
+
+        return redirect('/_admin/appointments')->with('success','Appointment Confirmed Successfully.');
     }
 }
