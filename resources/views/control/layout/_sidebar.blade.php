@@ -76,6 +76,27 @@
                     <span>Schedule</span>
                 </a>
             </li>
+            {{-- Patient --}}
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'add_new_patient' || Request::segment(2)=='patient_list') @else collapsed @endif" data-bs-target="#patient-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-bandaid"></i><span>Patients</span><i
+                        class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="patient-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="{{url('_doctor/add_new_patient')}}">
+                            <i class="bi bi-circle-fill"></i><span>Add new patient</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="components-accordion.html">
+                            <i class="bi bi-circle-fill"></i><span>Patient List</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+            </li>
+            {{-- End Patient --}}
             <li class="nav-item">
                 <a class="nav-link @if (Request::segment(2) == 'profile') @else collapsed @endif"
                     href="{{ url('/_doctor/profile') }}">
@@ -95,6 +116,7 @@
                 </a>
             </li>
         @endif
+
         @if (Auth::user() && Auth::user()->role == 1)
             <li class="nav-item">
                 <a class="nav-link @if (Request::segment(2) == 'appointments') @else collapsed @endif"

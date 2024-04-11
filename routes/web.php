@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\FrontEndController;
 use App\Http\Controllers\NurseController;
+use App\Http\Controllers\PdfGenerator;
 use App\Http\Controllers\PharmacistController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\UserController;
@@ -24,8 +25,9 @@ use App\Models\Doctor;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('control.user.appointment_card');
 });
+
 
 Route::get('/backRoute', [AuthController::class, 'loadLogin']);
 
@@ -113,6 +115,10 @@ Route::group(['prefix' => '_doctor', 'middleware' => ['web', 'isDoctor']], funct
     Route::get('/appointments', [DoctorController::class, 'appointments']);
     Route::post('/approve_appointment/{id}/', [DoctorController::class, 'approve_appointment']);
     Route::get('/cancel_appointment/{id}',[DoctorController::class,'cancel_appointment']);
+    Route::get('/visited/{id}',[DoctorController::class,'visited']);
+
+    //add new patient
+    Route::get('/add_new_patient',[DoctorController::class,'add_new_patient']);
 });
 //Nurse
 Route::group(['prefix' => '_nurse', 'middleware' => ['web', 'isNurse']], function () {
@@ -126,7 +132,8 @@ Route::group(['prefix' => '_user', 'middleware' => ['web', 'isUser']], function 
     Route::get('/dashboard', [UserController::class, 'dashboard']);
     Route::get('/appointments',[UserController::class, 'appointments']);
     Route::get('/resend_appointment/{id}',[UserController::class, 'resend_appointment']); 
-    Route::post('/post_resend_appointment/',[UserController::class, 'post_resend_appointment']);
+    Route::post('/post_resend_appointment',[UserController::class, 'post_resend_appointment']);
+    Route::get('/generateAppointmentCard/{id}',[PdfGenerator::class,'generateAppointmentCard']);
 });
 
 

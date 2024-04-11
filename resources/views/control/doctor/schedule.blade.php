@@ -114,6 +114,23 @@
                                 </td>
                             </tr>
                             <tr>
+                                <th scope="row">Saturday</th>
+                                <td>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-10">
+                                            <input class="form-control" type="time" id="formFile" name="saturday1" value="{{$getSchedule->sunday1}}">
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-10">
+                                            <input class="form-control" type="time" id="formFile" name="saturday2" value="{{$getSchedule->sunday2}}">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
                                 <th scope="row">Sunday</th>
                                 <td>
                                     <div class="row mb-3">
@@ -130,6 +147,7 @@
                                     </div>
                                 </td>
                             </tr>
+                            
 
                         </tbody>
 

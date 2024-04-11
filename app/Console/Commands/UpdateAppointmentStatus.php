@@ -28,10 +28,12 @@ class UpdateAppointmentStatus extends Command
     {
         //It will update the isConfirmed to 2 if the preferred date is lessthan current date.. cause it
         //it's the request for all previous request
-        $requested_appointment = RequestedAppointment::where('preferred_date','<',today())->get();
+        $requested_appointment = RequestedAppointment::where('preferred_date', '<', today())->get();
         foreach ($requested_appointment as $appointment) {
-            $appointment->isConfirmed = 2;
-            $appointment->save();
+            if ($appointment->isVisited == 0) {
+                $appointment->isConfirmed = 2;
+                $appointment->save();
+            }
         }
     }
 }

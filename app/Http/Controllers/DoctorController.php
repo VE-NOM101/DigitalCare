@@ -230,9 +230,17 @@ class DoctorController extends Controller
             $data['getApproved'] = $approved;
             $data['getApprovedSlots'] = $approvedSlots;
 
+            $data['getTodayList'] = RequestedAppointment::where('isApproved', 1)->where('isConfirmed',1)->where('doctor_id', $doctor_id)->where('preferred_date',Carbon::parse(today()))->get();
             return view('control.doctor.appointments', $data);
         }
         return redirect('/_doctor/dashboard')->with('error', 'Doctor yet not registered by admin');
+    }
+
+    public function visited($id){
+        $requested_appointment = RequestedAppointment::find($id);
+        $requested_appointment->isVisited = 1;
+        $requested_appointment->save();
+        return redirect('/_doctor/appointments')->with('success', 'Marked as Visited!');
     }
 
     public function approve_appointment($id, Request $request)
@@ -259,5 +267,11 @@ class DoctorController extends Controller
         $requested_appointment->save();
 
         return redirect('/_doctor/appointments')->with('warning', 'Appointment Canceled Successfully.');
+    }
+
+    //Patient
+    public function add_new_patient(){
+        $data['users'] = User::all();
+        return view('control.doctor.add_new_patient',$data);
     }
 }

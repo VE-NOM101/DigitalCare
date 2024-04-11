@@ -65,7 +65,9 @@
                                                 </td>
                                                 <td>
                                                     @if ($item->isApproved == 1 && $item->isConfirmed == 1)
-                                                        {{ '----' }}
+                                                        <a href="{{ url('_user/generateAppointmentCard/' . $item->id) }}"
+                                                            class="btn btn-outline-success mb-1">Download  <span></span>
+                                                            <i class="bi bi-cloud-arrow-down"></i></a>
                                                     @elseif($item->isConfirmed == 2)
                                                         <a href="{{ url('_user/resend_appointment/' . $item->id) }}"
                                                             class="btn btn-outline-primary mb-1">Resend <span></span>

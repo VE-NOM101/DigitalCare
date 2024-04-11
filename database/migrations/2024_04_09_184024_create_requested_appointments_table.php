@@ -22,6 +22,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->boolean('isApproved')->default(0);
             $table->tinyInteger('isConfirmed')->default(0);
+            $table->boolean('isVisited')->default(0);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
             
