@@ -13,8 +13,8 @@ class PdfGenerator extends Controller
     //
     public function generateAppointmentCard($id){
         
-        $data['getAA']=ApprovedAppointment::find($id);
-        $data['getRA']=RequestedAppointment::find($data['getAA']->request_id);
+        $data['getAA']=ApprovedAppointment::where('request_id',$id)->first();
+        $data['getRA']=RequestedAppointment::find($id);
         $data['getDoctor']=Doctor::find($data['getRA']->doctor_id);
         $pdf = Pdf::loadView('control.user.appointment_card', $data)->setOptions(['defaultFont' => 'sans-serif'])->setPaper('a4','potrait');
         return $pdf->stream('appointment'.now().rand('999','9999999').'.pdf');

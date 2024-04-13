@@ -12,4 +12,7 @@ class PharmacistController extends Controller
     {
         return view('control.pharmacist.dashboard');
     }
+    public function medicines(){
+        return view('control.pharmacist.medicines');
+    }
 }

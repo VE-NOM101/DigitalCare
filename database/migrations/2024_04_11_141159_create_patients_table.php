@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('patient_id');
             $table->unsignedBigInteger('user_id');
             $table->string("name")->nullable();
             $table->string("email")->nullable();
@@ -28,7 +27,7 @@ return new class extends Migration
             $table->string("allergy")->nullable();
             $table->unsignedInteger("weight")->nullable();
             $table->string("respiration")->nullable();
-            $table->string('bloodgroup')->nullable();
+            $table->string('blood_group')->nullable();
             $table->string('diet')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

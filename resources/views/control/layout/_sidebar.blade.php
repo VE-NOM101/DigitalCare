@@ -89,7 +89,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="components-accordion.html">
+                        <a href="{{url('_doctor/patient_list')}}">
                             <i class="bi bi-circle-fill"></i><span>Patient List</span>
                         </a>
                     </li>
@@ -97,6 +97,20 @@
                 </ul>
             </li>
             {{-- End Patient --}}
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'diagnosis') @else collapsed @endif"
+                    href="{{ url('/_doctor/diagnosis') }}">
+                    <i class="bi bi-virus2"></i>
+                    <span>Diagnosis</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'prescription') @else collapsed @endif"
+                    href="{{ url('/_doctor/prescription') }}">
+                    <i class="bi bi-prescription2"></i>
+                    <span>Prescription</span>
+                </a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link @if (Request::segment(2) == 'profile') @else collapsed @endif"
                     href="{{ url('/_doctor/profile') }}">
@@ -123,6 +137,23 @@
                     href="{{ url('/_user/appointments') }}">
                     <i class="bi bi-person-lines-fill"></i>
                     <span>Appointments</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'patient_profile') @else collapsed @endif"
+                    href="{{ url('/_user/patient_profile') }}">
+                    <i class="bi bi-person-square"></i>
+                    <span>Patient Profile</span>
+                </a>
+            </li>
+        @endif
+
+        @if (Auth::user() && Auth::user()->role == 3)
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'appointments') @else collapsed @endif"
+                    href="{{ url('/_pharmacist/medicines') }}">
+                    <i class="bi bi-capsule-pill"></i>
+                    <span>Medicines</span>
                 </a>
             </li>
         @endif

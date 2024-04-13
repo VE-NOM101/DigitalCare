@@ -26,12 +26,12 @@
             If you have any questions or concerns, please don't hesitate to contact our office. We're here to assist you
             every step of the way.
 
-            Thank you for entrusting us with your care. We look forward to seeing you on [{{\Carbon\Carbon::parse($getRA->preferred_date)->format('D-m-Y')}}] at [{{\Carbon\Carbon::parse($getAA->slotTime)->format('H:i')}}]
+            Thank you for entrusting us with your care. We look forward to seeing you on [{{\Carbon\Carbon::parse($getRA->preferred_date)->format('d-m-Y')}}] at [{{\Carbon\Carbon::parse($getAA->slotTime)->format('h:i A')}}]
         </div>
         <div style="border-radius:5px; border:rgb(16, 5, 98) 3px solid; padding:5px; margin-top:10px;">
             <h3>Best regards,</h3>
             <h4>{{$getDoctor->name}},</h4>
-            <h4>{{ now()->format('D-m-Y') }},</h4>
+            <h4>{{ now()->format('d-m-Y') }},</h4>
             <h4>@DigitalCare</h4>
         </div>
         <div style="border-radius:5px; border:rgb(19, 87, 36) 3px solid; padding:1px; margin-top:4px;">

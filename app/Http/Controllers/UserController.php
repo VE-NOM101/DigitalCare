@@ -7,6 +7,7 @@ use App\Models\Department;
 use App\Models\Doctor;
 use App\Models\Nurse;
 use App\Models\NurseAppointment;
+use App\Models\Patient;
 use App\Models\RequestedAppointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -72,7 +73,7 @@ class UserController extends Controller
         $data['getAA'] = ApprovedAppointment::all();
         $data['getNA'] = NurseAppointment::all();
         $data['getNurse'] = Nurse::all();
-
+      
         return view('control.user.appointments',$data);
     }
     public function resend_appointment($id){
@@ -118,5 +119,43 @@ class UserController extends Controller
         $appointment->save();
 
         return redirect('/_user/appointments')->with('success', 'Appointment resend successfully');
+    }
+
+    public function patient_profile(){
+    //     $doctor_id = Doctor::where('user_id', Auth::user()->id)->first()->id;
+        $data['getPatient'] = Patient::where('user_id',Auth::user()->id)->first();
+        $data['getAppointment'] = RequestedAppointment::where('user_id', Auth::user()->id)->get();
+        $data['getDoctor'] = Doctor::all();
+        $data['getApproved'] = ApprovedAppointment::all();
+        return view('control.user.patient_profile',$data);
+    }
+    public function add_profile_picture($id){
+        $data['id'] =$id;
+        $data['getPatient'] = Patient::find($id);
+        return view('control.user.add_profile_picture',$data);
+    }
+
+    public function post_add_profile_picture($id, Request $request){
+        $patient = Patient::find($id);
+        $request->validate([
+            'photo_path' => 'required|mimes:png,jpg,jpeg,bmp',
+        ]);
+
+        $imageName = '';
+        $deleteOldImage = 'digitalcare/patients/profile/' . $patient->photo_path;
+
+        if ($image = $request->file('photo_path')) {
+            if (file_exists($deleteOldImage)) {
+                File::delete($deleteOldImage);
+            }
+            $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
+            //into public folder
+            $image->move('digitalcare/patients/profile', $imageName);
+        } else {
+            $imageName = $patient->photo_path;
+        }
+        $patient->photo_path = $imageName;
+        $patient->save();
+        return redirect('/_user/patient_profile')->with('success', 'Picture Uploaded successfully');
     }
 }

@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\ApprovedAppointment;
 use App\Models\DaySchedule;
 use App\Models\Department;
+use App\Models\DiagnosisCategory;
 use App\Models\Doctor;
 use App\Models\Nurse;
+use App\Models\Patient;
 use App\Models\RequestedAppointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -229,14 +231,18 @@ class DoctorController extends Controller
             $data['getAvailableSlots'] = $allAvailableSlots;
             $data['getApproved'] = $approved;
             $data['getApprovedSlots'] = $approvedSlots;
-
-            $data['getTodayList'] = RequestedAppointment::where('isApproved', 1)->where('isConfirmed',1)->where('doctor_id', $doctor_id)->where('preferred_date',Carbon::parse(today()))->get();
+            $data['getTodayList'] = RequestedAppointment::where('isApproved', 1)
+                ->where('isConfirmed', 1)
+                ->where('doctor_id', $doctor_id)
+                ->whereDate('preferred_date', Carbon::today()->format('Y-m-d'))
+                ->get();
             return view('control.doctor.appointments', $data);
         }
         return redirect('/_doctor/dashboard')->with('error', 'Doctor yet not registered by admin');
     }
 
-    public function visited($id){
+    public function visited($id)
+    {
         $requested_appointment = RequestedAppointment::find($id);
         $requested_appointment->isVisited = 1;
         $requested_appointment->save();
@@ -268,10 +274,234 @@ class DoctorController extends Controller
 
         return redirect('/_doctor/appointments')->with('warning', 'Appointment Canceled Successfully.');
     }
-
     //Patient
-    public function add_new_patient(){
-        $data['users'] = User::all();
-        return view('control.doctor.add_new_patient',$data);
+    public function search_users(Request $request)
+    {
+        $email = trim($request->query('email')); // Trim input email
+
+        // Search for users by email (case-insensitive)
+        $users = User::whereRaw('LOWER(email) LIKE ?', ['%' . strtolower($email) . '%'])->get();
+
+        // Return search results as JSON
+        return response()->json($users);
+    }
+
+    public function add_new_patient()
+    {
+        return view('control.doctor.add_new_patient');
+    }
+    public function post_add_new_patient(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email',
+            'gender' => 'required',
+            'address' => 'required',
+            'age' => 'required',
+            'phone' => 'required',
+            'height' => 'required',
+            'blood_group' => 'required',
+            'pulse' => 'required',
+            'blood_pressure' => 'required',
+            'allergy' => 'required',
+            'weight' => 'required',
+            'respiration' => 'required',
+            'diet' => 'required',
+        ]);
+        $existingPatient = Patient::where('user_id', $request->id)->first();
+        $doctor_id = Doctor::where('user_id', Auth::user()->id)->first()->id;
+        if ($existingPatient) {
+            // Patient already exists
+            // Check if the patient is already associated with the doctor
+
+            if ($existingPatient->doctors->contains($doctor_id)) {
+                return redirect('/_doctor/add_new_patient')->with('warning', 'Patient already exists and is already attached to this doctor.');
+            } else {
+                // Attach the patient to the doctor
+                $existingPatient->doctors()->attach($doctor_id);
+                return redirect('/_doctor/add_new_patient')->with('warning', 'Patient already exists. Attached with doctor');
+            }
+        } else {
+            $patient = new Patient;
+            $patient->name = $request->name;
+            $patient->email = $request->email;
+            $patient->gender = $request->gender;
+            $patient->address = $request->address;
+            $patient->age = $request->age;
+            $patient->phone = $request->phone;
+            $patient->height = $request->height;
+            $patient->blood_group = $request->blood_group;
+            $patient->pulse = $request->pulse;
+            $patient->blood_pressure = $request->blood_pressure;
+            $patient->allergy = $request->allergy;
+            $patient->weight = $request->weight;
+            $patient->respiration = $request->respiration;
+            $patient->diet = $request->diet;
+            $patient->user_id = $request->id;
+            $patient->save();
+            $patient->doctors()->attach($doctor_id);
+            return redirect('/_doctor/add_new_patient')->with('success', 'New patient added succesfully');
+        }
+    }
+
+    public function patient_list()
+    {
+        $patient = Patient::all();
+        $doctor = Doctor::where('user_id', Auth::user()->id)->first();
+        $data['getMyPatientList'] = $doctor->patients;
+        $data['getAllPatientList'] = $patient;
+        return view('control.doctor.patient_list', $data);
+    }
+
+    public function view_patient($id)
+    {
+        $doctor_id = Doctor::where('user_id', Auth::user()->id)->first()->id;
+        $data['getPatient'] = Patient::find($id);
+        $data['getAppointment'] = RequestedAppointment::where('user_id', $data['getPatient']->user_id)->where('doctor_id', $doctor_id)->get();
+        $data['getDoctor'] = Doctor::all();
+        $data['getApproved'] = ApprovedAppointment::all();
+        return view('control.doctor.view_patient', $data);
+    }
+    public function attach_patient($id)
+    {
+        $patient = Patient::find($id);
+        $doctor = Doctor::where('user_id', Auth::user()->id)->first();
+        if ($patient->doctors->contains($doctor->id)) {
+            return redirect('/_doctor/patient_list')->with('warning', 'Patient already attached');
+        } else {
+
+            $patient->doctors()->attach($doctor->id);
+            return redirect('/_doctor/patient_list')->with('success', 'Patient attached succesfully');
+        }
+    }
+
+    public function edit_patient($id)
+    {
+        $data['getPatient'] = Patient::find($id);
+        return view('control.doctor.edit_patient', $data);
+    }
+    public function update_patient($id, Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'gender' => 'required',
+            'address' => 'required',
+            'age' => 'required',
+            'phone' => 'required',
+            'height' => 'required',
+            'blood_group' => 'required',
+            'pulse' => 'required',
+            'blood_pressure' => 'required',
+            'allergy' => 'required',
+            'weight' => 'required',
+            'respiration' => 'required',
+            'diet' => 'required',
+        ]);
+        $patient = Patient::find($id);
+        $patient->name = $request->name;
+        $patient->gender = $request->gender;
+        $patient->address = $request->address;
+        $patient->age = $request->age;
+        $patient->phone = $request->phone;
+        $patient->height = $request->height;
+        $patient->blood_group = $request->blood_group;
+        $patient->pulse = $request->pulse;
+        $patient->blood_pressure = $request->blood_pressure;
+        $patient->allergy = $request->allergy;
+        $patient->weight = $request->weight;
+        $patient->respiration = $request->respiration;
+        $patient->diet = $request->diet;
+        $patient->save();
+        return redirect('/_doctor/view_patient/' . $id)->with('success', 'Patient Updated succesfully');
+    }
+
+    public function detach_patient($id)
+    {
+        $doctor = Doctor::where('user_id', Auth::user()->id)->first();
+        $patient = Patient::find($id);
+        $patient->doctors()->detach($doctor->id);
+        return redirect('/_doctor/patient_list')->with('success', 'Patient Detached succesfully');
+    }
+
+    public function diagnosis()
+    {
+        $data['getDiagnosis'] = DiagnosisCategory::all();
+        return view('control.doctor.diagnosis', $data);
+    }
+    public function add_diagnosis()
+    {
+        return view('control.doctor.add_diagnosis');
+    }
+    public function post_add_diagnosis(Request $request)
+    {
+
+        $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+        ]);
+        if (DiagnosisCategory::where('name', $request->name)->count() == 0) {
+
+            $diagnosis_category = new DiagnosisCategory;
+            $diagnosis_category->name = $request->name;
+            $diagnosis_category->description = $request->description;
+            $diagnosis_category->save();
+
+            return redirect(url('_doctor/diagnosis'))->with('success', 'Diagnosis category added successfully');
+        } else {
+            return redirect(url('_doctor/diagnosis'))->with('error', 'Diagnosis category already exists');
+        }
+    }
+
+    public function edit_diagnosis($id)
+    {
+        $data['getDiagnosis'] = DiagnosisCategory::find($id);
+        return view('control.doctor.edit_diagnosis', $data);
+    }
+    public function update_diagnosis($id, Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+        ]);
+
+        if (DiagnosisCategory::where('name', $request->name)->count() == 1) {
+
+            $diagnosis_category = DiagnosisCategory::find($id);
+            $diagnosis_category->name = $request->name;
+            $diagnosis_category->description = $request->description;
+            $diagnosis_category->save();
+
+            return redirect(url('_doctor/diagnosis'))->with('success', 'Diagnosis category updated successfully');
+        } else {
+            return redirect(url('_doctor/diagnosis'))->with('error', 'Diagnosis category already exists');
+        }
+    }
+    public function delete_diagnosis($id)
+    {
+        $diagnosis = DiagnosisCategory::find($id);
+        $diagnosis->delete();
+        return redirect(url('_doctor/diagnosis'))->with('success', 'Diagnosis category deleted successfully');
+    }
+
+    public function prescription()
+    {
+        $doctor = Doctor::where('user_id', Auth::user()->id)->first();
+        $data['getPatientList'] = $doctor->patients;
+        $data['getDiagnosis'] = DiagnosisCategory::all();
+        return view('control.doctor.prescription', $data);
+    }
+
+    public function get_patient_appointments(Request $request)
+    {
+        $patientId = $request->input('patient_id');
+        $patient = Patient::find($patientId);
+
+        if (!$patient) {
+            return response()->json(['error' => 'Patient not found'], 404);
+        }
+        $doctor = Doctor::where('user_id',Auth::user()->id)->first();
+        // Fetch appointments for the selected patient
+        $appointments = RequestedAppointment::where('doctor_id',$doctor->id)->where('user_id',$patient->user_id)->where('isVisited',1)->get();
+        return response()->json($appointments);
     }
 }

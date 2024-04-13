@@ -5,12 +5,17 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>Dashboard: 
-        @if(Auth::user()->role==1){{'User'}}
-        @elseif(Auth::user()->role==2){{'Doctor'}}
-        @elseif(Auth::user()->role==3){{'Pharmacist'}}
-        @elseif(Auth::user()->role==4){{'Admin'}}
-        @endif</title>
+    <title>Dashboard:
+        @if (Auth::user()->role == 1)
+            {{ 'User' }}
+        @elseif(Auth::user()->role == 2)
+            {{ 'Doctor' }}
+        @elseif(Auth::user()->role == 3)
+            {{ 'Pharmacist' }}
+        @elseif(Auth::user()->role == 4)
+            {{ 'Admin' }}
+        @endif
+    </title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
@@ -71,8 +76,9 @@
 
     <script>
         function submitForm(id) {
-          document.getElementById("appointment_form_"+id).submit();
+            document.getElementById("appointment_form_" + id).submit();
         }
+
     </script>
 
 </body>

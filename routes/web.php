@@ -101,6 +101,8 @@ Route::group(['prefix' => '_admin', 'middleware' => ['web', 'isAdmin']], functio
 //Pharmacist
 Route::group(['prefix' => '_pharmacist', 'middleware' => ['web', 'isPharmacist']], function () {
     Route::get('/dashboard', [PharmacistController::class, 'dashboard']);
+
+    Route::get('/medicines',[PharmacistController::class,'medicines']);
 });
 //Doctor
 Route::group(['prefix' => '_doctor', 'middleware' => ['web', 'isDoctor']], function () {
@@ -116,9 +118,30 @@ Route::group(['prefix' => '_doctor', 'middleware' => ['web', 'isDoctor']], funct
     Route::post('/approve_appointment/{id}/', [DoctorController::class, 'approve_appointment']);
     Route::get('/cancel_appointment/{id}',[DoctorController::class,'cancel_appointment']);
     Route::get('/visited/{id}',[DoctorController::class,'visited']);
+    // Route for searching users by email
+    Route::get('/search_users', [DoctorController::class,'search_users']);
+
 
     //add new patient
     Route::get('/add_new_patient',[DoctorController::class,'add_new_patient']);
+    Route::post('/add_new_patient',[DoctorController::class,'post_add_new_patient']);
+
+    Route::get('/patient_list',[DoctorController::class,'patient_list']);
+    Route::get('/view_patient/{id}',[DoctorController::class,'view_patient']);
+    Route::get('/attach_patient/{id}',[DoctorController::class,'attach_patient']);
+    Route::get('/edit_patient/{id}',[DoctorController::class,'edit_patient']);
+    Route::post('/update_patient/{id}',[DoctorController::class,'update_patient']);
+    Route::get('/detach_patient/{id}',[DoctorController::class,'detach_patient']);
+
+    Route::get('/diagnosis',[DoctorController::class,'diagnosis']);
+    Route::get('/add_diagnosis',[DoctorController::class,'add_diagnosis']);
+    Route::post('/add_diagnosis',[DoctorController::class,'post_add_diagnosis']);
+    Route::get('/edit_diagnosis/{id}',[DoctorController::class,'edit_diagnosis']);
+    Route::post('/update_diagnosis/{id}',[DoctorController::class,'update_diagnosis']);
+    Route::get('/delete_diagnosis/{id}',[DoctorController::class,'delete_diagnosis']);
+
+    Route::get('/prescription',[DoctorController::class,'prescription']);
+    Route::get('/get_patient_appointments', [DoctorController::class,'get_patient_appointments']);
 });
 //Nurse
 Route::group(['prefix' => '_nurse', 'middleware' => ['web', 'isNurse']], function () {
@@ -134,6 +157,10 @@ Route::group(['prefix' => '_user', 'middleware' => ['web', 'isUser']], function 
     Route::get('/resend_appointment/{id}',[UserController::class, 'resend_appointment']); 
     Route::post('/post_resend_appointment',[UserController::class, 'post_resend_appointment']);
     Route::get('/generateAppointmentCard/{id}',[PdfGenerator::class,'generateAppointmentCard']);
+
+    Route::get('/patient_profile',[UserController::class,'patient_profile']);
+    Route::get('/add_profile_picture/{id}',[UserController::class,'add_profile_picture']);
+    Route::post('/add_profile_picture/{id}',[UserController::class,'post_add_profile_picture']);
 });
 
 

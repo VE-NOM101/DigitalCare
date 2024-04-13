@@ -37,7 +37,7 @@
                                                 <td scope="row" row>{{ $getDoctor->find($item->doctor_id)->name }}</td>
                                                 <td>
                                                     @if ($item->isApproved == 1 && $item->isConfirmed == 1)
-                                                        {{ $getNurse->find($getNA->find($getAA->find($item->id)->nurse_appointment_id)->nurse_id)->name }}
+                                                        {{ $getNurse->find($getNA->find($getAA->where('request_id',$item->id)->first()->nurse_appointment_id)->nurse_id)->name }}
                                                     @else
                                                         {{ '-' }}
                                                     @endif
@@ -45,8 +45,8 @@
                                                 <td>{{ $item->description }}</td>
                                                 <td>
                                                     <p>{{ $item->preferred_date }}</p>
-                                                    @if ($getAA->find($item->id))
-                                                        <p>{{ $getAA->find($item->id)->slotTime }}</p>
+                                                    @if ($getAA->where('request_id',$item->id)->count()>0)
+                                                        <p>{{ \Carbon\Carbon::parse($getAA->where('request_id',$item->id)->first()->slotTime)->format('h:i A') }}</p>
                                                     @else
                                                         {{ '---' }}
                                                     @endif

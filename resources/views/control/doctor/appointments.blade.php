@@ -54,7 +54,7 @@
                                                 <td>{{ $item->preferred_date }}</td>
                                                 <td>
                                                     <span class="badge bg-success">
-                                                        {{ \Carbon\Carbon::parse($getApprovedSlots->where('request_id', $item->id)->first()->slotTime)->format('h:iA') }}
+                                                        {{ \Carbon\Carbon::parse($getApprovedSlots->where('request_id', $item->id)->first()->slotTime)->format('h:i A') }}
                                                     </span>
                                                 </td>
                                                 <td>
@@ -101,7 +101,7 @@
                                                     <td>{{ $item->preferred_date }}</td>
                                                     <td>
                                                         @if ($item->isConfirmed == 0 || $item->isConfirmed == 1)
-                                                            {{ \Carbon\Carbon::parse($getApprovedSlots->where('request_id', $item->id)->first()->slotTime)->format('H:iA') }}
+                                                            {{ \Carbon\Carbon::parse($getApprovedSlots->where('request_id', $item->id)->first()->slotTime)->format('h:i A') }}
                                                         @endif
                                                     </td>
                                                     <td>
