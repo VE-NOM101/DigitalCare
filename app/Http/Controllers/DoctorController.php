@@ -7,6 +7,7 @@ use App\Models\DaySchedule;
 use App\Models\Department;
 use App\Models\DiagnosisCategory;
 use App\Models\Doctor;
+use App\Models\Medicine;
 use App\Models\Nurse;
 use App\Models\Patient;
 use App\Models\RequestedAppointment;
@@ -464,7 +465,7 @@ class DoctorController extends Controller
             'description' => 'required',
         ]);
 
-        if (DiagnosisCategory::where('name', $request->name)->count() == 1) {
+        if (DiagnosisCategory::where('name', $request->name)->where('id','<>',$id)->count() == 0) {
 
             $diagnosis_category = DiagnosisCategory::find($id);
             $diagnosis_category->name = $request->name;
@@ -488,6 +489,7 @@ class DoctorController extends Controller
         $doctor = Doctor::where('user_id', Auth::user()->id)->first();
         $data['getPatientList'] = $doctor->patients;
         $data['getDiagnosis'] = DiagnosisCategory::all();
+        $data['getMedicine'] = Medicine::all();
         return view('control.doctor.prescription', $data);
     }
 
@@ -503,5 +505,13 @@ class DoctorController extends Controller
         // Fetch appointments for the selected patient
         $appointments = RequestedAppointment::where('doctor_id',$doctor->id)->where('user_id',$patient->user_id)->where('isVisited',1)->get();
         return response()->json($appointments);
+    }
+
+    public function add_new_prescription(){
+        $doctor = Doctor::where('user_id', Auth::user()->id)->first();
+        $data['getPatientList'] = $doctor->patients;
+        $data['getDiagnosis'] = DiagnosisCategory::all();
+        $data['getMedicine'] = Medicine::all();
+        return view('control.doctor.add_new_prescription',$data);
     }
 }

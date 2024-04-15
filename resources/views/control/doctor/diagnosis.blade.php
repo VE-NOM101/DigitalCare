@@ -5,19 +5,19 @@
             @include('auth.message')
             @include('auth.error')
             <div class="card-body">
-                <h5 class="card-title">Prescription</h5>
+                <h5 class="card-title">Diagnosis</h5>
 
                 <!-- Bordered Tabs Justified -->
                 <ul class="nav nav-tabs nav-tabs-bordered d-flex" id="borderedTabJustified" role="tablist">
                     <li class="nav-item flex-fill" role="presentation">
                         <button class="nav-link w-100 active" id="home-tab" data-bs-toggle="tab"
                             data-bs-target="#bordered-justified-home" type="button" role="tab" aria-controls="home"
-                            aria-selected="true">Prescription List</button>
+                            aria-selected="true">Diagnosis Category</button>
                     </li>
                     <li class="nav-item flex-fill" role="presentation">
                         <button class="nav-link w-100" id="profile-tab" data-bs-toggle="tab"
                             data-bs-target="#bordered-justified-profile" type="button" role="tab"
-                            aria-controls="profile" aria-selected="false">Add Prescription</button>
+                            aria-controls="profile" aria-selected="false">Diagnosis Tests</button>
                     </li>
                     <li class="nav-item flex-fill" role="presentation">
                         <button class="nav-link w-100" id="contact-tab" data-bs-toggle="tab"
@@ -39,7 +39,7 @@
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
-                            {{-- <tbody>
+                            <tbody>
                                 @foreach ($getDiagnosis as $item)
                                     <tr>
                                         <td scope="row">{{ $item->id }}</td>
@@ -53,7 +53,7 @@
 
                                     </tr>
                                 @endforeach
-                            </tbody> --}}
+                            </tbody>
                         </table>
 
                     </div>

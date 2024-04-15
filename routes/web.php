@@ -103,6 +103,20 @@ Route::group(['prefix' => '_pharmacist', 'middleware' => ['web', 'isPharmacist']
     Route::get('/dashboard', [PharmacistController::class, 'dashboard']);
 
     Route::get('/medicines',[PharmacistController::class,'medicines']);
+    Route::get('/add_medicine_category',[PharmacistController::class,'add_medicine_category']);
+    Route::post('/add_medicine_category',[PharmacistController::class,'post_add_medicine_category']);
+    Route::get('/edit_medicine_category/{id}',[PharmacistController::class,'edit_medicine_category']);
+    Route::post('/edit_medicine_category/{id}',[PharmacistController::class,'update_medicine_category']);
+    Route::get('/delete_medicine_category/{id}',[PharmacistController::class,'delete_medicine_category']);
+   
+    Route::get('/add_medicine_brand',[PharmacistController::class,'add_medicine_brand']);
+    Route::post('/add_medicine_brand',[PharmacistController::class,'post_add_medicine_brand']);
+    Route::get('/edit_medicine_brand/{id}',[PharmacistController::class,'edit_medicine_brand']);
+    Route::post('/edit_medicine_brand/{id}',[PharmacistController::class,'update_medicine_brand']);
+    Route::get('/delete_medicine_brand/{id}',[PharmacistController::class,'delete_medicine_brand']);
+
+    Route::get('/add_medicine',[PharmacistController::class,'add_medicine']);
+    Route::post('/add_medicine',[PharmacistController::class,'post_add_medicine']);
 });
 //Doctor
 Route::group(['prefix' => '_doctor', 'middleware' => ['web', 'isDoctor']], function () {
@@ -142,6 +156,8 @@ Route::group(['prefix' => '_doctor', 'middleware' => ['web', 'isDoctor']], funct
 
     Route::get('/prescription',[DoctorController::class,'prescription']);
     Route::get('/get_patient_appointments', [DoctorController::class,'get_patient_appointments']);
+    Route::get('/add_new_prescription',[DoctorController::class,'add_new_prescription']);
+    Route::post('/add_new_prescription',[DoctorController::class,'post_add_new_prescription']);
 });
 //Nurse
 Route::group(['prefix' => '_nurse', 'middleware' => ['web', 'isNurse']], function () {
