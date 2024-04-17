@@ -8,6 +8,7 @@ use App\Models\Doctor;
 use App\Models\Nurse;
 use App\Models\NurseAppointment;
 use App\Models\Patient;
+use App\Models\Prescription;
 use App\Models\RequestedAppointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -157,5 +158,28 @@ class UserController extends Controller
         $patient->photo_path = $imageName;
         $patient->save();
         return redirect('/_user/patient_profile')->with('success', 'Picture Uploaded successfully');
+    }
+
+    public function prescription()
+    {
+        $patient = Patient::where('user_id',Auth::user()->id)->first();
+
+        $data['getPrescription'] = Prescription::where('patient_id', $patient->id)->get();
+        $data['getPatient'] = Patient::all();
+        $data['getRA'] = RequestedAppointment::all();
+        $data['getAA'] = ApprovedAppointment::all();
+        $data['getDoctor'] = Doctor::all();
+        return view('control.user.prescription', $data);
+    }
+
+    public function view_prescription($id)
+    {
+        $data['getPrescription'] = Prescription::find($id);
+        $data['getRA'] = RequestedAppointment::find($data['getPrescription']->req_appointment_id);
+        $data['getDoctor'] = Doctor::find($data['getPrescription']->doctor_id);
+        $data['getPatient'] = Patient::find($data['getPrescription']->patient_id);
+        $data['getDiagnosis'] = $data['getPrescription']->diagnoses()->get();
+        $data['getMedicine'] = $data['getPrescription']->medicines()->get();
+        return view('control.user.view_prescription', $data);
     }
 }

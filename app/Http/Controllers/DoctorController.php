@@ -10,6 +10,7 @@ use App\Models\Doctor;
 use App\Models\Medicine;
 use App\Models\Nurse;
 use App\Models\Patient;
+use App\Models\Prescription;
 use App\Models\RequestedAppointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -465,7 +466,7 @@ class DoctorController extends Controller
             'description' => 'required',
         ]);
 
-        if (DiagnosisCategory::where('name', $request->name)->where('id','<>',$id)->count() == 0) {
+        if (DiagnosisCategory::where('name', $request->name)->where('id', '<>', $id)->count() == 0) {
 
             $diagnosis_category = DiagnosisCategory::find($id);
             $diagnosis_category->name = $request->name;
@@ -487,9 +488,10 @@ class DoctorController extends Controller
     public function prescription()
     {
         $doctor = Doctor::where('user_id', Auth::user()->id)->first();
-        $data['getPatientList'] = $doctor->patients;
-        $data['getDiagnosis'] = DiagnosisCategory::all();
-        $data['getMedicine'] = Medicine::all();
+        $data['getPrescription'] = Prescription::where('doctor_id', $doctor->id)->get();
+        $data['getPatient'] = Patient::all();
+        $data['getRA'] = RequestedAppointment::all();
+        $data['getAA'] = ApprovedAppointment::all();
         return view('control.doctor.prescription', $data);
     }
 
@@ -501,17 +503,130 @@ class DoctorController extends Controller
         if (!$patient) {
             return response()->json(['error' => 'Patient not found'], 404);
         }
-        $doctor = Doctor::where('user_id',Auth::user()->id)->first();
+        $doctor = Doctor::where('user_id', Auth::user()->id)->first();
         // Fetch appointments for the selected patient
-        $appointments = RequestedAppointment::where('doctor_id',$doctor->id)->where('user_id',$patient->user_id)->where('isVisited',1)->get();
+        $appointments = RequestedAppointment::where('doctor_id', $doctor->id)->where('user_id', $patient->user_id)->where('isVisited', 1)->get();
         return response()->json($appointments);
     }
 
-    public function add_new_prescription(){
+    public function add_new_prescription()
+    {
         $doctor = Doctor::where('user_id', Auth::user()->id)->first();
         $data['getPatientList'] = $doctor->patients;
         $data['getDiagnosis'] = DiagnosisCategory::all();
         $data['getMedicine'] = Medicine::all();
-        return view('control.doctor.add_new_prescription',$data);
+        return view('control.doctor.add_new_prescription', $data);
+    }
+
+    public function post_add_new_prescription(Request $request)
+    {
+        // Validate the form data
+        $request->validate([
+            'patient_id' => 'required|exists:patients,id',
+            'req_appointment_id' => 'required|exists:requested_appointments,id',
+            'symptoms' => 'required',
+            'diagnosis' => 'required',
+            // Add validation rules for other fields as needed
+        ]);
+        $doctor = Doctor::where('user_id', Auth::user()->id)->first();
+        // Create a new prescription instance
+        $prescription = new Prescription();
+        $prescription->patient_id = $request->patient_id;
+        $prescription->req_appointment_id = $request->req_appointment_id;
+        $prescription->doctor_id = $doctor->id;
+        $prescription->symptoms = $request->symptoms;
+        $prescription->test_report = $request->test_report;
+        $prescription->test_report_note = $request->test_report_note;
+        // If diagnosis is multiple, ensure it's an array
+        // Add other fields to the prescription instance
+
+        // Save the prescription
+        $prescription->save();
+
+        // Handle medicine and test report information
+        // Loop through medicine_id and medicine_notes to store each medicine
+        foreach ($request->medicine_id as $key => $medicineId) {
+            $prescription->medicines()->attach($medicineId, ['notes' => $request->medicine_notes[$key]]);
+        }
+        // Attach diagnoses
+        $prescription->diagnoses()->attach($request->input('diagnosis'));
+        // Redirect back with success message
+        return redirect()->back()->with('success', 'Prescription added successfully.');
+    }
+
+    public function view_prescription($id)
+    {
+        $data['getPrescription'] = Prescription::find($id);
+        $data['getRA'] = RequestedAppointment::find($data['getPrescription']->req_appointment_id);
+        $data['getDoctor'] = Doctor::find($data['getPrescription']->doctor_id);
+        $data['getPatient'] = Patient::find($data['getPrescription']->patient_id);
+        $data['getDiagnosis'] = $data['getPrescription']->diagnoses()->get();
+        $data['getMedicine'] = $data['getPrescription']->medicines()->get();
+        return view('control.doctor.view_prescription', $data);
+    }
+
+    public function edit_prescription($id)
+    {
+        $data['getPrescription'] = Prescription::find($id);
+        $data['getPatient'] = Patient::find(Prescription::find($id)->patient_id);
+        $data['getAppointment'] = RequestedAppointment::find(Prescription::find($id)->req_appointment_id);
+        $data['getSlotTime'] = ApprovedAppointment::where('request_id', Prescription::find($id)->req_appointment_id)->first();
+        $data['getDiagnosis'] = DiagnosisCategory::all();
+        $data['getMedicine'] = Medicine::all();
+        $data['getPreviousMedicine'] = $data['getPrescription']->medicines()->withPivot('notes')->get();
+        return view('control.doctor.edit_prescription', $data);
+    }
+    public function update_prescription($id, Request $request)
+    {
+        // Validate the form data
+        $request->validate([
+            'symptoms' => 'required',
+            'diagnosis' => 'required',
+            // Add validation rules for other fields as needed
+        ]);
+
+        // Find the prescription by ID
+        $prescription = Prescription::findOrFail($id);
+
+        // Update prescription details
+        $prescription->symptoms = $request->symptoms;
+        $prescription->test_report = $request->test_report;
+        $prescription->test_report_note = $request->test_report_note;
+        // Add other fields to the prescription instance
+
+        // Save the prescription updates
+        $prescription->save();
+
+        // Detach previously attached medicines
+        $prescription->medicines()->detach();
+
+        // Detach previously attached diagnoses
+        $prescription->diagnoses()->detach();
+
+        // Attach new medicines and diagnoses
+        foreach ($request->medicine_id as $key => $medicineId) {
+            $prescription->medicines()->attach($medicineId, ['notes' => $request->medicine_notes[$key]]);
+        }
+        $prescription->diagnoses()->attach($request->input('diagnosis'));
+
+        // Redirect back with success message
+        return redirect('/_doctor/prescription')->with('success', 'Prescription updated successfully.');
+    }
+    public function delete_prescription($id)
+    {
+        // Find the prescription by ID
+        $prescription = Prescription::findOrFail($id);
+
+        // Detach associated medicines
+        $prescription->medicines()->detach();
+
+        // Detach associated diagnoses
+        $prescription->diagnoses()->detach();
+
+        // Delete the prescription
+        $prescription->delete();
+
+        // Redirect back with success message
+        return redirect()->back()->with('success', 'Prescription deleted successfully.');
     }
 }

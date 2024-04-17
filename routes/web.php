@@ -158,6 +158,11 @@ Route::group(['prefix' => '_doctor', 'middleware' => ['web', 'isDoctor']], funct
     Route::get('/get_patient_appointments', [DoctorController::class,'get_patient_appointments']);
     Route::get('/add_new_prescription',[DoctorController::class,'add_new_prescription']);
     Route::post('/add_new_prescription',[DoctorController::class,'post_add_new_prescription']);
+    Route::get('/view_prescription/{id}',[DoctorController::class,'view_prescription']);
+    Route::get('/edit_prescription/{id}',[DoctorController::class,'edit_prescription']);
+    Route::post('/edit_prescription/{id}',[DoctorController::class,'update_prescription']);
+    Route::get('/delete_prescription/{id}',[DoctorController::class,'delete_prescription']);
+
 });
 //Nurse
 Route::group(['prefix' => '_nurse', 'middleware' => ['web', 'isNurse']], function () {
@@ -177,6 +182,9 @@ Route::group(['prefix' => '_user', 'middleware' => ['web', 'isUser']], function 
     Route::get('/patient_profile',[UserController::class,'patient_profile']);
     Route::get('/add_profile_picture/{id}',[UserController::class,'add_profile_picture']);
     Route::post('/add_profile_picture/{id}',[UserController::class,'post_add_profile_picture']);
+
+    Route::get('/prescription',[UserController::class,'prescription']);
+    Route::get('/view_prescription/{id}',[UserController::class,'view_prescription']);
 });
 
 

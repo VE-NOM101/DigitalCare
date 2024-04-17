@@ -146,6 +146,13 @@
                     <span>Patient Profile</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'prescription') @else collapsed @endif"
+                    href="{{ url('/_user/prescription') }}">
+                    <i class="bi bi-prescription2"></i>
+                    <span>Prescription</span>
+                </a>
+            </li>
         @endif
 
         @if (Auth::user() && Auth::user()->role == 3)
