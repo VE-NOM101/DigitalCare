@@ -14,4 +14,9 @@ class Medicine extends Model
     public function medicine_brands(){
         return $this->belongsTo(MedicineBrand::class,'brand_id','id');
     }
+    public function medicinePurchases()
+    {
+        return $this->belongsToMany(MedicinePurchase::class, 'medicine_purchase_pivot', 'medicine_id', 'medicine_purchase_id')
+                    ->withPivot('amount', 'tax', 'lot_no', 'quantity');
+    }
 }

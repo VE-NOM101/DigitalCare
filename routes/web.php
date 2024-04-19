@@ -96,6 +96,11 @@ Route::group(['prefix' => '_admin', 'middleware' => ['web', 'isAdmin']], functio
     Route::get('/nurses', [AdminController::class, 'nurses']);
     Route::post('/add_nurses', [AdminController::class, 'add_nurses']);
     Route::get('/delete_nurses/{id}', [AdminController::class, 'delete_nurses']);
+
+    Route::get('/pharmacists', [AdminController::class, 'pharmacists']);
+    Route::post('/add_pharmacists', [AdminController::class, 'add_pharmacists']);
+    Route::get('/delete_pharmacists/{id}', [AdminController::class, 'delete_pharmacists']);
+    
 });
 
 //Pharmacist
@@ -117,6 +122,16 @@ Route::group(['prefix' => '_pharmacist', 'middleware' => ['web', 'isPharmacist']
 
     Route::get('/add_medicine',[PharmacistController::class,'add_medicine']);
     Route::post('/add_medicine',[PharmacistController::class,'post_add_medicine']);
+
+    Route::get('/buy_medicine',[PharmacistController::class,'buy_medicine']);
+    Route::post('/buy_medicine',[PharmacistController::class,'post_buy_medicine']);
+    Route::get('/view_medicine_purchase/{id}',[PharmacistController::class,'view_medicine_purchase']);
+
+    Route::get('/getMedicinePrices/{id}',[PharmacistController::class,'getMedicinePrices']);
+    Route::get('/profile', [PharmacistController::class, 'profile']);
+
+    Route::post('/edit_profile/{id}',[PharmacistController::class,'edit_profile']);
+
 });
 //Doctor
 Route::group(['prefix' => '_doctor', 'middleware' => ['web', 'isDoctor']], function () {

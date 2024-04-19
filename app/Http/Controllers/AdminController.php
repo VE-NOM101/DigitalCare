@@ -9,6 +9,7 @@ use App\Models\Department;
 use App\Models\Doctor;
 use App\Models\Nurse;
 use App\Models\NurseAppointment;
+use App\Models\Pharmacist;
 use App\Models\RequestedAppointment;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -255,7 +256,7 @@ class AdminController extends Controller
     {
         $nurse = Nurse::find($id);
         $nurse->delete();
-        return redirect('/_admin/nurses')->with('success', 'Doctor deleted successfully');
+        return redirect('/_admin/nurses')->with('success', 'Nurse deleted successfully');
     }
 
     //appointments
@@ -315,5 +316,35 @@ class AdminController extends Controller
         }else{
             return redirect('/_admin/appointments')->with('error', 'No nurse selected.');
         }
+    }
+
+
+    public function pharmacists(){
+        $pharmacists['getPharmacist'] = User::where('role', 3)->get();
+        $pharmacists['getRecord'] = Pharmacist::get();
+        return view('control.admin.pharmacists',$pharmacists);
+    }
+    public function add_pharmacists(Request $request)
+    {
+        $pharmacists = new Pharmacist;
+        $user = User::find($request->input('user_id'));
+        $check = $pharmacists->where('email', '=', $user->email)->first();
+        if ($check) {
+
+            return redirect('/_admin/pharmacists')->with('error', 'Pharmacists already exists');
+        }
+
+        $pharmacists->user_id = $request->input('user_id');
+        $pharmacists->name = $user->name;
+        $pharmacists->email = $user->email;
+        $pharmacists->address = $user->address;
+        $pharmacists->save();
+        return redirect('/_admin/pharmacists')->with('success', 'Pharmacists added successfully');
+    }
+    public function delete_pharmacists($id)
+    {
+        $pharmacist = Pharmacist::find($id);
+        $pharmacist->delete();
+        return redirect('/_admin/pharmacists')->with('success', 'Pharmacist deleted successfully');
     }
 }

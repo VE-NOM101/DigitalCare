@@ -12,7 +12,7 @@
                     <li class="nav-item flex-fill" role="presentation">
                         <button class="nav-link w-100" id="home-tab" data-bs-toggle="tab"
                             data-bs-target="#bordered-justified-home" type="button" role="tab" aria-controls="home"
-                            aria-selected="true">Medicine Categories</button>
+                            aria-selected="false">Medicine Categories</button>
                     </li>
                     <li class="nav-item flex-fill" role="presentation">
                         <button class="nav-link w-100" id="profile-tab" data-bs-toggle="tab"
@@ -22,7 +22,7 @@
                     <li class="nav-item flex-fill" role="presentation">
                         <button class="nav-link w-100 active" id="medicine-tab" data-bs-toggle="tab"
                             data-bs-target="#bordered-justified-medicine" type="button" role="tab"
-                            aria-controls="medicine" aria-selected="false">Medicines</button>
+                            aria-controls="medicine" aria-selected="true">Medicines</button>
                     </li>
                     <li class="nav-item flex-fill" role="presentation">
                         <button class="nav-link w-100" id="purchase-tab" data-bs-toggle="tab"
@@ -36,8 +36,7 @@
                     </li>
                 </ul>
                 <div class="tab-content pt-2" id="borderedTabJustifiedContent">
-                    <div class="tab-pane fade" id="bordered-justified-home" role="tabpanel"
-                        aria-labelledby="home-tab">
+                    <div class="tab-pane fade" id="bordered-justified-home" role="tabpanel" aria-labelledby="home-tab">
                         <a class="btn btn-info text-center" href="{{ url('/_pharmacist/add_medicine_category') }}">Add
                             Medicine
                             Category<span> </span><i class="bi bi-plus-circle-fill"></i></a>
@@ -139,16 +138,13 @@
                                         <td class="text-center">{{ $item->name }}</td>
                                         <td class="text-center">{{ $getCategory->find($item->category_id)->name }}</td>
                                         <td class="text-center">{{ $getBrand->find($item->brand_id)->brand }}</td>
-                                        <td class="text-center"><span class="badge bg-primary">{{ $item->quantity}}</span></td>
+                                        <td class="text-center"><span
+                                                class="badge bg-primary">{{ $item->quantity }}</span></td>
                                         <td class="text-center">{{ $item->selling_price }}</td>
                                         <td class="text-center">{{ $item->buying_price }}</td>
                                         <td class="text-center">
                                             <a href="{{ url('_pharmacist/edit_medicine/' . $item->id) }}"
                                                 class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
-
-                                            <a href="{{ url('_pharmacist/delete_medicine/' . $item->id) }}"
-                                                onclick="return confirm('Are you sure that you want to delete?')"
-                                                class="btn btn-danger"><i class="bi bi-trash"></i></a>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -157,6 +153,38 @@
                     </div>
                     <div class="tab-pane fade" id="bordered-justified-purchase" role="tabpanel"
                         aria-labelledby="purchase-tab">
+                        <a class="btn btn-info text-center" href="{{ url('/_pharmacist/buy_medicine') }}">Buy
+                            Medicine<span> </span><i class="bi bi-plus-circle-fill"></i></a>
+                        <table class="table table-striped datatable">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#Purchase Number</th>
+                                    <th scope="col">Discount</th>
+                                    <th scope="col">Net</th>
+                                    <th scope="col">Method of payment</th>
+                                    <th scope="col">Action</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($getMedicinePurchase as $item)
+                                    <tr>
+                                        <td scope="row" class="text-center">Dig@SL::{{ $item->id }}</td>
+                                        <td class="text-center">{{ $item->discount }}</td>
+                                        <td class="text-center">{{ $item->net }}</td>
+                                        <td class="text-center">{{ $item->payment_method}}</td>
+                                        <td class="text-center">
+                                            <a href="{{ url('_pharmacist/view_medicine_purchase/' . $item->id) }}"
+                                                class="btn btn-info"><i class="bi bi-eye"></i></a>
+
+                                            <a href="{{ url('_pharmacist/delete_medicine_purchase/' . $item->id) }}"
+                                                onclick="return confirm('Are you sure that you want to delete?')"
+                                                class="btn btn-danger"><i class="bi bi-trash"></i></a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
 
                     </div>
                     <div class="tab-pane fade" id="bordered-justified-contact" role="tabpanel"

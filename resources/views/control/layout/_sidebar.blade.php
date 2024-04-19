@@ -59,6 +59,13 @@
                     <span>Nurses</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'pharmacists') @else collapsed @endif"
+                    href="{{ url('/_admin/pharmacists') }}">
+                    <i class="bi bi-prescription"></i>
+                    <span>Pharmacists</span>
+                </a>
+            </li>
         @endif
 
         @if (Auth::user() && Auth::user()->role == 2)
@@ -161,6 +168,13 @@
                     href="{{ url('/_pharmacist/medicines') }}">
                     <i class="bi bi-capsule-pill"></i>
                     <span>Medicines</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'profile') @else collapsed @endif"
+                    href="{{ url('/_pharmacist/profile') }}">
+                    <i class="bi bi-person"></i>
+                    <span>Profile</span>
                 </a>
             </li>
         @endif
