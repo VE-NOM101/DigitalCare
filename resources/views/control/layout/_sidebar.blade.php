@@ -125,6 +125,27 @@
                     <span>Profile</span>
                 </a>
             </li>
+            {{-- Invoices --}}
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'invoices_list' || Request::segment(2)=='create_invoices') @else collapsed @endif" data-bs-target="#invoices-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-receipt-cutoff"></i><span>Invoices</span><i
+                        class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="invoices-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="{{url('_doctor/invoices_list')}}">
+                            <i class="bi bi-circle-fill"></i><span>List of Invoices</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{url('_doctor/create_invoices')}}">
+                            <i class="bi bi-circle-fill"></i><span>Create Invoices</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+            </li>
+            {{-- End invoices --}}
         @endif
 
 

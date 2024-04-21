@@ -178,6 +178,9 @@ Route::group(['prefix' => '_doctor', 'middleware' => ['web', 'isDoctor']], funct
     Route::post('/edit_prescription/{id}',[DoctorController::class,'update_prescription']);
     Route::get('/delete_prescription/{id}',[DoctorController::class,'delete_prescription']);
 
+    Route::get('/create_invoices',[DoctorController::class,'create_invoices']);
+    Route::get('invoices_list',[DoctorController::class,'invoices_list']);
+
 });
 //Nurse
 Route::group(['prefix' => '_nurse', 'middleware' => ['web', 'isNurse']], function () {

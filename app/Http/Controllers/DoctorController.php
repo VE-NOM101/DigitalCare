@@ -629,4 +629,14 @@ class DoctorController extends Controller
         // Redirect back with success message
         return redirect()->back()->with('success', 'Prescription deleted successfully.');
     }
+
+
+    //invoices
+    public function create_invoices(){
+        $doctor = Doctor::where('user_id', Auth::user()->id)->first();
+        $data['getPatientList'] = $doctor->patients;
+        $data['getDiagnosis'] = DiagnosisCategory::all();
+        $data['getMedicine'] = Medicine::all();
+        return view('control.doctor.create_invoices', $data);
+    }
 }
