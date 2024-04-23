@@ -6,7 +6,7 @@
         <h5 style="text-align:center;" class="card-title alert alert-success">New Invoice</h5>
         <div class="card-body">
             <!-- Multi Columns Form -->
-            <form class="row g-3" action="{{ url('_doctor/') }}" method="POST">
+            <form class="row g-3" action="{{ url('_doctor/create_invoices') }}" method="POST">
                 @csrf
                 <h6 style="text-align:center;" class="card-title alert alert-warning">Invoices Details
                 </h6>
