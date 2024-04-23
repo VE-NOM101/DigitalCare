@@ -118,13 +118,6 @@
                     <span>Prescription</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link @if (Request::segment(2) == 'profile') @else collapsed @endif"
-                    href="{{ url('/_doctor/profile') }}">
-                    <i class="bi bi-person"></i>
-                    <span>Profile</span>
-                </a>
-            </li>
             {{-- Invoices --}}
             <li class="nav-item">
                 <a class="nav-link @if (Request::segment(2) == 'invoices_list' || Request::segment(2)=='create_invoices') @else collapsed @endif" data-bs-target="#invoices-nav" data-bs-toggle="collapse" href="#">
@@ -146,6 +139,14 @@
                 </ul>
             </li>
             {{-- End invoices --}}
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'profile') @else collapsed @endif"
+                    href="{{ url('/_doctor/profile') }}">
+                    <i class="bi bi-person"></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+            
         @endif
 
 
@@ -179,6 +180,13 @@
                     href="{{ url('/_user/prescription') }}">
                     <i class="bi bi-prescription2"></i>
                     <span>Prescription</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'my_invoice') @else collapsed @endif"
+                    href="{{ url('/_user/my_invoice') }}">
+                    <i class="bi bi-receipt-cutoff"></i>
+                    <span>My Invoices</span>
                 </a>
             </li>
         @endif

@@ -8,6 +8,7 @@ use App\Models\Doctor;
 use App\Models\Nurse;
 use App\Models\NurseAppointment;
 use App\Models\Patient;
+use App\Models\PatientInvoice;
 use App\Models\Prescription;
 use App\Models\RequestedAppointment;
 use Illuminate\Http\Request;
@@ -181,5 +182,20 @@ class UserController extends Controller
         $data['getDiagnosis'] = $data['getPrescription']->diagnoses()->get();
         $data['getMedicine'] = $data['getPrescription']->medicines()->get();
         return view('control.user.view_prescription', $data);
+    }
+    
+    public function view_invoice($id){
+        $data['getInvoice'] = PatientInvoice::find($id);
+        $data['getDoctor'] = Doctor::find($data['getInvoice']->doctor_id);
+        $data['getPatient'] = Patient::find($data['getInvoice']->patient_id);
+        $data['getRA'] = RequestedAppointment::find($data['getInvoice']->req_appointment_id);
+        return view('control.user.view_invoice',$data);
+    }
+    public function my_invoice(){
+        $patient_id = Patient::where('user_id', Auth::user()->id)->first()->id;
+        $data['getPatientInvoices'] = PatientInvoice::where('patient_id',$patient_id)->get();
+        $data['getDoctor'] = Doctor::all();
+        $data['getRA'] = RequestedAppointment::all();
+        return view('control.user.my_invoice', $data);
     }
 }

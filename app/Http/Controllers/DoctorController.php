@@ -10,6 +10,7 @@ use App\Models\Doctor;
 use App\Models\Medicine;
 use App\Models\Nurse;
 use App\Models\Patient;
+use App\Models\PatientInvoice;
 use App\Models\Prescription;
 use App\Models\RequestedAppointment;
 use Illuminate\Http\Request;
@@ -632,11 +633,57 @@ class DoctorController extends Controller
 
 
     //invoices
-    public function create_invoices(){
+    public function create_invoices()
+    {
         $doctor = Doctor::where('user_id', Auth::user()->id)->first();
         $data['getPatientList'] = $doctor->patients;
         $data['getDiagnosis'] = DiagnosisCategory::all();
         $data['getMedicine'] = Medicine::all();
         return view('control.doctor.create_invoices', $data);
+    }
+    public function post_create_invoices(Request $request)
+    {
+        $request->validate([
+            'patient_id' => 'required',
+            'req_appointment_id' => 'required',
+            'payment_method' => 'required',
+            'payment_status' => 'required',
+            'title' => 'required',
+            'amount' => 'required',
+        ]);
+        if (PatientInvoice::where('req_appointment_id', $request->req_appointment_id)->count() > 0) {
+            return redirect('/_doctor/invoices_list')->with('warning', 'Invoice already exists for this appointment successfully');
+        }
+        $patient_invoice = new PatientInvoice();
+        $patient_invoice->patient_id = $request->patient_id;
+        $patient_invoice->req_appointment_id = $request->req_appointment_id;
+        $patient_invoice->doctor_id = Doctor::where('user_id', Auth::user()->id)->first()->id;
+        $patient_invoice->payment_method = $request->payment_method;
+        $patient_invoice->status = $request->payment_status;
+        $patient_invoice->title = $request->title;
+        $patient_invoice->amount = $request->amount;
+        $patient_invoice->save();
+        return redirect('/_doctor/invoices_list')->with('success', 'Invoice added successfully');
+    }
+
+    public function invoices_list()
+    {
+        $doctor_id = Doctor::where('user_id', Auth::user()->id)->first()->id;
+        $data['getPatientInvoices'] = PatientInvoice::where('doctor_id',$doctor_id)->get();
+        $data['getPatient'] = Patient::all();
+        $data['getRA'] = RequestedAppointment::all();
+        return view('control.doctor.invoices_list', $data);
+    }
+
+    public function view_invoice($id){
+        $data['getInvoice'] = PatientInvoice::find($id);
+        $data['getDoctor'] = Doctor::find($data['getInvoice']->doctor_id);
+        $data['getPatient'] = Patient::find($data['getInvoice']->patient_id);
+        $data['getRA'] = RequestedAppointment::find($data['getInvoice']->req_appointment_id);
+        return view('control.doctor.view_invoice',$data);
+    }
+    public function delete_invoice($id){
+        $invoice = PatientInvoice::find($id);
+        $invoice->delete();return redirect('/_doctor/invoices_list')->with('success', 'Invoice deleted successfully');
     }
 }

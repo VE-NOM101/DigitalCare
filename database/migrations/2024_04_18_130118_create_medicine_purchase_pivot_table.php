@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('lot_no');
             $table->unsignedBigInteger('quantity');
             $table->unsignedBigInteger('tax');
-            $table->unsignedBigInteger('amount');
+            $table->double('amount');
             $table->foreign('medicine_purchase_id')->references('id')->on('medicine_purchases')->onDelete('cascade');
             $table->foreign('medicine_id')->references('id')->on('medicines')->onDelete('cascade');
         });

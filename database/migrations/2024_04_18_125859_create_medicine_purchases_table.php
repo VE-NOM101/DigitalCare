@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('pharmacist_id');
             $table->text('note');
             $table->unsignedBigInteger('discount');
-            $table->unsignedBigInteger('net');
+            $table->double('net');
             $table->string('payment_method');
             $table->timestamps();
             $table->foreign('pharmacist_id')->references('id')->on('pharmacists')->onDelete('cascade');
