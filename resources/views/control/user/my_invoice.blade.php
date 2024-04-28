@@ -6,7 +6,6 @@
             @include('auth.error')
             <div class="card-body">
                 <h5 class="card-title">Invoices</h5>
-                <a href="{{ url('/_doctor/create_invoices') }}" class="btn btn-info text-center"><i class="bi bi-plus-circle-fill"></i>Add new invoice</a>
                 <!-- Bordered Tabs Justified -->
                 <ul class="nav nav-tabs nav-tabs-bordered d-flex" id="borderedTabJustified" role="tablist">
                     <li class="nav-item flex-fill" role="presentation">
@@ -32,8 +31,8 @@
                                                         <th>#</th>
                                                         <th>Doctor Name</th>
                                                         <th>Appointment Date</th>
-                                                        <th>Title</th> 
-                                                        <th>Payment Method</th> 
+                                                        <th>Title</th>
+                                                        <th>Payment Method</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -43,14 +42,24 @@
                                                         <tr>
                                                             <td>{{ $item->id }}</td>
                                                             <td>{{ $getDoctor->find($item->doctor_id)->name }}</td>
-                                                            <td>{{ $getRA->find($item->req_appointment_id)->preferred_date }}</td>
-                                                            <td>{{ $item->title}}</td>
-                                                            <td>{{ $item->payment_method}}</td>
-                                                            <td>@if ($item->status == 'unpaid')
-                                                                <span class="badge bg-warning text-dark"><i class="bi bi-x-octagon">Unpaid</i></span>
-                                                            @else
-                                                            <span class="badge bg-success text-dark"><i class="bi bi-currency-dollar">Paid</i></span>
-                                                            @endif</td> 
+                                                            <td>
+                                                                @if ($item->req_appointment_id)
+                                                                    {{ $getRA->find($item->req_appointment_id)->preferred_date }}
+                                                                @else
+                                                                    -
+                                                                @endif
+                                                            </td>
+                                                            <td>{{ $item->title }}</td>
+                                                            <td>{{ $item->payment_method }}</td>
+                                                            <td>
+                                                                @if ($item->status == 'unpaid')
+                                                                    <span class="badge bg-warning text-dark"><i
+                                                                            class="bi bi-x-octagon">Unpaid</i></span>
+                                                                @else
+                                                                    <span class="badge bg-success text-dark"><i
+                                                                            class="bi bi-currency-dollar">Paid</i></span>
+                                                                @endif
+                                                            </td>
                                                             <td>
                                                                 <a href="{{ url('_user/view_invoice/' . $item->id) }}"
                                                                     class="btn btn-outline-info mb-1">View

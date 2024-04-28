@@ -37,17 +37,9 @@
     <link href="{{ config('app.url') }}/Admin/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
     <link href="{{ config('app.url') }}/Admin/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
     <link href="{{ config('app.url') }}/Admin/assets/vendor/simple-datatables/style.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Template Main CSS File -->
     <link href="{{ config('app.url') }}/Admin/assets/css/style.css" rel="stylesheet">
-
-    <!-- =======================================================
-  * Template Name: NiceAdmin
-  * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
-  * Updated: Mar 17 2024 with Bootstrap v5.3.3
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
 </head>
 
 <body>

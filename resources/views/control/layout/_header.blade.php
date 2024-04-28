@@ -45,9 +45,9 @@
               <li class="nav-item dropdown">
 
 
-                  <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
-                      <i class="bi bi-bell"></i>
-                      <span class="badge bg-primary badge-number">4</span>
+                  <a class="nav-link nav-icon" href="{{url('/chatify')}}" >
+                    {{-- data-bs-toggle="dropdown" --}}
+                    <i class="bi bi-chat-dots"></i>
                   </a><!-- End Notification Icon -->
 
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">

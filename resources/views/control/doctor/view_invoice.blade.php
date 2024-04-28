@@ -45,7 +45,9 @@
                     <h6 style="font-weight: bold;">Invoice Date:
                         {{ \Carbon\Carbon::parse($getInvoice->updated_at)->format('d-m-Y | h:i A') }}</h6>
                     <h6 style="font-weight: bold;">Appointment Date:
-                        {{ \Carbon\Carbon::parse($getRA->preferred_date)->format('d-m-Y') }}</h6>
+                        @if($getRA) {{ \Carbon\Carbon::parse($getRA->preferred_date)->format('d-m-Y') }}</h6>
+                        @else -
+                        @endif
                     <!-- Content for dates goes here -->
                 </div>
             </div>

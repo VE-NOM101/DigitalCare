@@ -43,7 +43,10 @@
                                                         <tr>
                                                             <td>{{ $item->id }}</td>
                                                             <td>{{ $getPatient->find($item->patient_id)->name }}</td>
-                                                            <td>{{ $getRA->find($item->req_appointment_id)->preferred_date }}</td>
+                                                            <td>@if($item->req_appointment_id){{ $getRA->find($item->req_appointment_id)->preferred_date }}
+                                                                @else -
+                                                                @endif
+                                                            </td>
                                                             <td>{{ $item->title}}</td>
                                                             <td>{{ $item->payment_method}}</td>
                                                             <td>@if ($item->status == 'unpaid')

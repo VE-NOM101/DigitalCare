@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\ApprovedAppointment;
+use App\Models\BedType;
 use App\Models\Block;
+use App\Models\BookAmbulance;
 use App\Models\DaySchedule;
 use App\Models\Department;
 use App\Models\Doctor;
+use App\Models\IpdPatient;
 use App\Models\Nurse;
 use App\Models\NurseAppointment;
+use App\Models\Patient;
+use App\Models\PatientInvoice;
 use App\Models\Pharmacist;
 use App\Models\RequestedAppointment;
 use Illuminate\Http\Request;
@@ -313,16 +318,17 @@ class AdminController extends Controller
             $requested_appointment->isConfirmed = 1;
             $requested_appointment->save();
             return redirect('/_admin/appointments')->with('success', 'Appointment Confirmed Successfully.');
-        }else{
+        } else {
             return redirect('/_admin/appointments')->with('error', 'No nurse selected.');
         }
     }
 
 
-    public function pharmacists(){
+    public function pharmacists()
+    {
         $pharmacists['getPharmacist'] = User::where('role', 3)->get();
         $pharmacists['getRecord'] = Pharmacist::get();
-        return view('control.admin.pharmacists',$pharmacists);
+        return view('control.admin.pharmacists', $pharmacists);
     }
     public function add_pharmacists(Request $request)
     {
@@ -346,5 +352,166 @@ class AdminController extends Controller
         $pharmacist = Pharmacist::find($id);
         $pharmacist->delete();
         return redirect('/_admin/pharmacists')->with('success', 'Pharmacist deleted successfully');
+    }
+
+    //IPD Patient
+    public function bed_management()
+    {
+        $data['getBed'] = BedType::all();
+        $data['getIpd'] = IpdPatient::all();
+        $data['getPatient'] = Patient::all();
+        return view('control.admin.bed_management', $data);
+    }
+    public function add_bed(Request $request)
+    {
+        $request->validate([
+            'type' => 'required',
+            'charge' => 'required',
+            'description' => 'max:250'
+        ]);
+        if (BedType::where('type', $request->type)->count() > 0) {
+            return redirect('/_admin/bed_management')->with('error', 'Bed type already exists');
+        }
+        $bed = new BedType();
+        $bed->type = $request->type;
+        $bed->description = $request->description;
+        $bed->color = $request->color;
+        $bed->size = $request->size;
+        $bed->charge = $request->charge;
+
+        $bed->save();
+
+        return redirect('/_admin/bed_management')->with('success', 'Bed type added successfully');
+    }
+
+    public function edit_bed($id)
+    {
+        $data['getBed'] = BedType::find($id);
+        return view('control.admin.edit_bed', $data);
+    }
+    public function post_edit_bed($id, Request $request)
+    {
+        $request->validate([
+            'type' => 'required',
+            'charge' => 'required',
+            'description' => 'max:250'
+        ]);
+        if (BedType::where('type', $request->type)->where('id', '<>', $id)->count() == 0) {
+
+            $bed = BedType::find($id);
+            $bed->type = $request->type;
+            $bed->description = $request->description;
+            $bed->color = $request->color;
+            $bed->size = $request->size;
+            $bed->charge = $request->charge;
+
+            $bed->save();
+
+            return redirect(url('_admin/bed_management'))->with('success', 'Bed Type updated successfully');
+        } else {
+            return redirect(url('_admin/bed_management'))->with('error', 'Bed Type already exists');
+        }
+    }
+
+    public function delete_bed($id)
+    {
+        $bed = BedType::find($id);
+        $bed->delete();
+        return redirect(url('_admin/bed_management'))->with('success', 'Bed Type deleted successfully');
+    }
+
+
+    //ipd_patient
+
+    public function ipd_patient()
+    {
+        $data['getPatient'] = Patient::all();
+        $data['getDoctor'] = Doctor::all();
+        $data['getBedType'] = BedType::all();
+        $data['getIpd'] = IpdPatient::all();
+        $data['getInvoice'] = PatientInvoice::all();
+        return view('control.admin.ipd_patient', $data);
+    }
+    public function add_ipd_patient(Request $request)
+    {
+        $request->validate([
+            'admission_date' => 'required',
+        ]);
+        $check = IpdPatient::where('bed_id', $request->bed_id)->count();
+        if (IpdPatient::where('patient_id', $request->patient_id)->count() == 0 && $check < BedType::find($request->bed_id)->size) {
+            $ipd_patient = new IpdPatient();
+            $ipd_patient->patient_id = $request->patient_id;
+            $ipd_patient->doctor_id = $request->doctor_id;
+            $ipd_patient->bed_id = $request->bed_id;
+            $ipd_patient->admission_date = $request->admission_date;
+            $ipd_patient->note = $request->note;
+
+            $patient_invoice = new PatientInvoice();
+            $patient_invoice->patient_id = $request->patient_id;
+            $patient_invoice->doctor_id = $request->doctor_id;
+            $patient_invoice->payment_method = $request->payment_method;
+            $patient_invoice->status = $request->bill_status;
+            $patient_invoice->title = $request->note;
+            $patient_invoice->amount = BedType::find($request->bed_id)->charge;
+            $patient_invoice->save();
+            //
+            $ipd_patient->invoice_id = $patient_invoice->id;
+            $ipd_patient->save();
+            return redirect('/_admin/ipd_patient')->with('success', 'Ipd-Patient In Inserted Successfully');
+        } else {
+            return redirect('/_admin/ipd_patient')->with('error', 'Patient already exists Or bed is not available');
+        }
+    }
+
+    public function edit_ipd_patient($id)
+    {
+        $data['getPatient'] = Patient::all();
+        $data['getDoctor'] = Doctor::all();
+        $data['getBedType'] = BedType::all();
+        $data['getIpd'] = IpdPatient::find($id);
+        $data['getPayment'] = PatientInvoice::find($data['getIpd']->invoice_id)->payment_method;
+        return view('control.admin.edit_ipd_patient', $data);
+    }
+
+    public function post_edit_ipd_patient($id, Request $request)
+    {
+        $request->validate([
+            'admission_date' => 'required',
+        ]);
+        $ipd_patient = IpdPatient::find($id);
+        $ipd_patient->doctor_id = $request->doctor_id;
+        $ipd_patient->bed_id = $request->bed_id;
+        $ipd_patient->admission_date = $request->admission_date;
+        $ipd_patient->note = $request->note;
+         //
+         $patient_invoice = PatientInvoice::find($ipd_patient->invoice_id);
+         $patient_invoice->doctor_id = $request->doctor_id;
+         $patient_invoice->payment_method = $request->payment_method;
+         $patient_invoice->status = $request->bill_status;
+         $patient_invoice->title = $request->note;
+         $patient_invoice->amount = BedType::find($request->bed_id)->charge;
+         $patient_invoice->save();
+         //
+        $ipd_patient->save();
+        return redirect('/_admin/ipd_patient')->with('success', 'Ipd-Patient In Updated Successfully');
+    }
+
+    public function delete_ipd_patient($id){
+        $ipd_patient = IpdPatient::find($id);
+        $ipd_patient->delete();
+        return redirect('/_admin/ipd_patient')->with('success', 'Ipd-Patient In Deleted Successfully');
+    }
+
+    //book ambulance
+
+    public function book_ambulance(){
+        $data['getBookAmbulance'] = BookAmbulance::all();
+        
+        return view('control.admin.book_ambulance',$data);
+    }
+    public function show_map($id){
+        $data['getMap'] = BookAmbulance::find($id);
+        
+        return view('control.admin.show_map',$data);
     }
 }

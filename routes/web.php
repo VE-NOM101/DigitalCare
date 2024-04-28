@@ -9,6 +9,7 @@ use App\Http\Controllers\FrontEndController;
 use App\Http\Controllers\NurseController;
 use App\Http\Controllers\PdfGenerator;
 use App\Http\Controllers\PharmacistController;
+use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SslCommerzPaymentController;
@@ -101,6 +102,25 @@ Route::group(['prefix' => '_admin', 'middleware' => ['web', 'isAdmin']], functio
     Route::get('/pharmacists', [AdminController::class, 'pharmacists']);
     Route::post('/add_pharmacists', [AdminController::class, 'add_pharmacists']);
     Route::get('/delete_pharmacists/{id}', [AdminController::class, 'delete_pharmacists']);
+
+    //IPD Patient
+    Route::get('/ipd_patient',[AdminController::class,'ipd_patient']);
+    Route::post('/add_ipd_patient',[AdminController::class,'add_ipd_patient']);
+    Route::get('/edit_ipd_patient/{id}',[AdminController::class,'edit_ipd_patient']);
+    Route::post('/edit_ipd_patient/{id}',[AdminController::class,'post_edit_ipd_patient']);
+    Route::get('/delete_ipd_patient/{id}',[AdminController::class,'delete_ipd_patient']);
+
+    //Bad Management
+    Route::get('/bed_management',[AdminController::class,'bed_management']);
+    Route::post('/add_bed',[AdminController::class,'add_bed']);
+    Route::get('/edit_bed/{id}',[AdminController::class,'edit_bed']);
+    Route::post('/edit_bed/{id}',[AdminController::class,'post_edit_bed']);
+    Route::get('/delete_bed/{id}',[AdminController::class,'delete_bed']);
+
+    //Book ambulance
+    Route::get('/book_ambulance',[AdminController::class,'book_ambulance']);
+    Route::get('/show_map/{id}',[AdminController::class,'show_map']);
+
 });
 
 //Pharmacist
@@ -182,6 +202,14 @@ Route::group(['prefix' => '_doctor', 'middleware' => ['web', 'isDoctor']], funct
     Route::get('/invoices_list', [DoctorController::class, 'invoices_list']);
     Route::get('/view_invoice/{id}', [DoctorController::class,'view_invoice']);
     Route::get('/delete_invoice/{id}', [DoctorController::class,'delete_invoice']);
+
+    //IPD Patient
+    Route::get('/ipd_patient',[DoctorController::class,'ipd_patient']);
+    Route::post('/add_ipd_patient',[DoctorController::class,'add_ipd_patient']);
+    Route::get('/edit_ipd_patient/{id}',[DoctorController::class,'edit_ipd_patient']);
+    Route::post('/edit_ipd_patient/{id}',[DoctorController::class,'post_edit_ipd_patient']);
+    Route::get('/delete_ipd_patient/{id}',[DoctorController::class,'delete_ipd_patient']);
+    
 });
 //Nurse
 Route::group(['prefix' => '_nurse', 'middleware' => ['web', 'isNurse']], function () {
@@ -221,4 +249,7 @@ Route::post('/cancel', [SslCommerzPaymentController::class, 'cancel']);
 Route::post('/ipn', [SslCommerzPaymentController::class, 'ipn']);
 //SSLCOMMERZ END
 
-Route::get('/insert', [AuthController::class, 'insert']);
+//Ambulance
+
+Route::get('/book_ambulance/',[FrontEndController::class,'book_ambulance']);
+Route::post('/book_ambulance/',[FrontEndController::class,'post_book_ambulance']);
