@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('patient_invoices', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('patient_id');
-            $table->unsignedBigInteger('req_appointment_id');
+            $table->unsignedBigInteger('req_appointment_id')->nullable();
             $table->unsignedBigInteger('doctor_id');
             $table->string('payment_method');
             $table->string('status');

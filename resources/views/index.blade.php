@@ -63,8 +63,9 @@
                             <a class="new-btn-d br-2" href="/register"><span>Sign Up</span></a>
                         @endif
 
-                        <div class="mail-b"><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i>
-                                demo@gmail.com</a></div>
+                        <div class="p-2"><a href="{{url('/book_ambulance/')}}" class="btn btn-danger"><i class="fa fa-ambulance"
+                                    aria-hidden="true"></i>Emergency Ambulance</a>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-6">
@@ -352,7 +353,8 @@
                                         <div class="form-group">
                                             <label class="control-label" for="name">Name</label>
                                             <input id="name" name="name" type="text"
-                                                placeholder="{{ Auth::user()->name }}" value="{{ Auth::user()->name }}" disabled
+                                                placeholder="{{ Auth::user()->name }}"
+                                                value="{{ Auth::user()->name }}" disabled
                                                 class="form-control input-md">
                                         </div>
                                     </div>
@@ -361,7 +363,8 @@
                                         <div class="form-group">
                                             <label class="control-label" for="email">Email</label>
                                             <input id="email" name="email" type="email"
-                                                placeholder="{{ Auth::user()->email }}" value="{{ Auth::user()->email }}" disabled
+                                                placeholder="{{ Auth::user()->email }}"
+                                                value="{{ Auth::user()->email }}" disabled
                                                 class="form-control input-md">
                                         </div>
                                     </div>
@@ -417,13 +420,15 @@
                                     <!-- Button -->
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <button id="singlebutton" name="singlebutton" class="new-btn-d br-2">Make An Appointment</button>
+                                            <button id="singlebutton" name="singlebutton" class="new-btn-d br-2">Make
+                                                An Appointment</button>
                                         </div>
                                     </div>
                                 </div>
                             </form>
-                            @else
-                            <div style="font-size:1.5rem;" class="alert alert-warning alert-dismissible fade show" role="alert">
+                        @else
+                            <div style="font-size:1.5rem;" class="alert alert-warning alert-dismissible fade show"
+                                role="alert">
                                 Please login first
                             </div>
                         @endif

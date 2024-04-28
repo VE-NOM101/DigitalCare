@@ -45,7 +45,12 @@
                     <h6 style="font-weight: bold;">Invoice Date:
                         {{ \Carbon\Carbon::parse($getInvoice->updated_at)->format('d-m-Y | h:i A') }}</h6>
                     <h6 style="font-weight: bold;">Appointment Date:
-                        {{ \Carbon\Carbon::parse($getRA->preferred_date)->format('d-m-Y') }}</h6>
+                        @if ($getRA)
+                            {{ \Carbon\Carbon::parse($getRA->preferred_date)->format('d-m-Y') }}
+                        @else
+                            -
+                        @endif
+                    </h6>
                     <!-- Content for dates goes here -->
                 </div>
             </div>
@@ -81,15 +86,16 @@
                 </div>
                 <div class="col-md-3">
                     <h4><span style="color:cornflowerblue;">Total</span> :
-                        {{ $getInvoice->amount + $getInvoice->amount*$getInvoice->tax/100 }}Tk</h4>
+                        {{ $getInvoice->amount + ($getInvoice->amount * $getInvoice->tax) / 100 }}Tk</h4>
                     <!-- Content for patient goes here -->
                 </div>
-                @if($getInvoice->status == 'unpaid')
-                <div class="col-md-12 text-center">
-                    <br><br>
-                    <h3><a href="{{url('/_user/payment/'.$getInvoice->id)}}" type="button" class="btn btn-primary"><i class="bi bi-paypal"></i><span> </span>Quick Pay</a></h3>
-                </div>   
-                @endif             
+                @if ($getInvoice->status == 'unpaid')
+                    <div class="col-md-12 text-center">
+                        <br><br>
+                        <h3><a href="{{ url('/_user/payment/' . $getInvoice->id) }}" type="button"
+                                class="btn btn-primary"><i class="bi bi-paypal"></i><span> </span>Quick Pay</a></h3>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

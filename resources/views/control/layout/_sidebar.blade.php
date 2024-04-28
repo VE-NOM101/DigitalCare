@@ -1,5 +1,6 @@
 <!-- ======= Sidebar ======= -->
 <aside id="sidebar" class="sidebar">
+    
 
     <ul class="sidebar-nav" id="sidebar-nav">
 
@@ -43,6 +44,27 @@
                     href="{{ url('/_admin/departments') }}">
                     <i class="bi bi-file-medical"></i>
                     <span>Departments</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'ipd_patient') @else collapsed @endif"
+                    href="{{ url('/_admin/ipd_patient') }}">
+                    <i class="bi bi-person-wheelchair"></i>
+                    <span>IPD-Patient In</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'bed_management') @else collapsed @endif"
+                    href="{{ url('/_admin/bed_management') }}">
+                    <i class="fas fa-bed"></i>
+                    <span>Bed Management</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'book_ambulance') @else collapsed @endif"
+                    href="{{ url('/_admin/book_ambulance') }}">
+                    <i class="fas fa-ambulance"></i>
+                    <span>Book Ambulance</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -109,6 +131,13 @@
                     href="{{ url('/_doctor/diagnosis') }}">
                     <i class="bi bi-virus2"></i>
                     <span>Diagnosis</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'ipd_patient') @else collapsed @endif"
+                    href="{{ url('/_doctor/ipd_patient') }}">
+                    <i class="bi bi-person-wheelchair"></i>
+                    <span>IPD-Patient In</span>
                 </a>
             </li>
             <li class="nav-item">

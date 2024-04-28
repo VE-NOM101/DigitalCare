@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\ApprovedAppointment;
+use App\Models\BedType;
 use App\Models\DaySchedule;
 use App\Models\Department;
 use App\Models\DiagnosisCategory;
 use App\Models\Doctor;
+use App\Models\IpdPatient;
 use App\Models\Medicine;
 use App\Models\Nurse;
 use App\Models\Patient;
@@ -669,21 +671,108 @@ class DoctorController extends Controller
     public function invoices_list()
     {
         $doctor_id = Doctor::where('user_id', Auth::user()->id)->first()->id;
-        $data['getPatientInvoices'] = PatientInvoice::where('doctor_id',$doctor_id)->get();
+        $data['getPatientInvoices'] = PatientInvoice::where('doctor_id', $doctor_id)->get();
         $data['getPatient'] = Patient::all();
         $data['getRA'] = RequestedAppointment::all();
         return view('control.doctor.invoices_list', $data);
     }
 
-    public function view_invoice($id){
+    public function view_invoice($id)
+    {
         $data['getInvoice'] = PatientInvoice::find($id);
         $data['getDoctor'] = Doctor::find($data['getInvoice']->doctor_id);
         $data['getPatient'] = Patient::find($data['getInvoice']->patient_id);
         $data['getRA'] = RequestedAppointment::find($data['getInvoice']->req_appointment_id);
-        return view('control.doctor.view_invoice',$data);
+        return view('control.doctor.view_invoice', $data);
     }
-    public function delete_invoice($id){
+    public function delete_invoice($id)
+    {
         $invoice = PatientInvoice::find($id);
-        $invoice->delete();return redirect('/_doctor/invoices_list')->with('success', 'Invoice deleted successfully');
+        $invoice->delete();
+        return redirect('/_doctor/invoices_list')->with('success', 'Invoice deleted successfully');
+    }
+
+    //ipd_patient
+
+    public function ipd_patient()
+    {
+        $data['getPatient'] = Patient::all();
+        $data['getDoctor'] = Doctor::where('user_id', Auth::user()->id)->first();
+        $data['getBedType'] = BedType::all();
+        $doctor_id = Doctor::where('user_id', Auth::user()->id)->first()->id;
+        $data['getIpd'] = IpdPatient::where('doctor_id', $doctor_id)->get();
+        $data['getInvoice'] = PatientInvoice::all();
+        return view('control.doctor.ipd_patient', $data);
+    }
+    public function add_ipd_patient(Request $request)
+    {
+        $request->validate([
+            'admission_date' => 'required',
+        ]);
+        $check = IpdPatient::where('bed_id', $request->bed_id)->count();
+        if (IpdPatient::where('patient_id', $request->patient_id)->count() == 0 && $check < BedType::find($request->bed_id)->size) {
+            $ipd_patient = new IpdPatient();
+            $ipd_patient->patient_id = $request->patient_id;
+            $ipd_patient->doctor_id = $request->doctor_id;
+            $ipd_patient->bed_id = $request->bed_id;
+            $ipd_patient->admission_date = $request->admission_date;
+            $ipd_patient->note = $request->note;
+            //
+            $patient_invoice = new PatientInvoice();
+            $patient_invoice->patient_id = $request->patient_id;
+            $patient_invoice->doctor_id = $request->doctor_id;
+            $patient_invoice->payment_method = $request->payment_method;
+            $patient_invoice->status = $request->bill_status;
+            $patient_invoice->title = $request->note;
+            $patient_invoice->amount = BedType::find($request->bed_id)->charge;
+            $patient_invoice->save();
+            //
+            $ipd_patient->invoice_id = $patient_invoice->id;
+            $ipd_patient->save();
+            return redirect('/_doctor/ipd_patient')->with('success', 'Ipd-Patient In Inserted Successfully');
+        } else {
+            return redirect('/_doctor/ipd_patient')->with('error', 'Patient already exists Or bed is not available');
+        }
+    }
+
+    public function edit_ipd_patient($id)
+    {
+        $data['getPatient'] = Patient::all();
+        $data['getDoctor'] = Doctor::all();
+        $data['getBedType'] = BedType::all();
+        $data['getIpd'] = IpdPatient::find($id);
+        $data['getPayment'] = PatientInvoice::find($data['getIpd']->invoice_id)->payment_method;
+        return view('control.doctor.edit_ipd_patient', $data);
+    }
+
+    public function post_edit_ipd_patient($id, Request $request)
+    {
+        $request->validate([
+            'admission_date' => 'required',
+        ]);
+        $ipd_patient = IpdPatient::find($id);
+        $ipd_patient->doctor_id = $request->doctor_id;
+        $ipd_patient->bed_id = $request->bed_id;
+        $ipd_patient->admission_date = $request->admission_date;
+        $ipd_patient->note = $request->note;
+
+        //
+        $patient_invoice = PatientInvoice::find($ipd_patient->invoice_id);
+        $patient_invoice->doctor_id = $request->doctor_id;
+        $patient_invoice->payment_method = $request->payment_method;
+        $patient_invoice->status = $request->bill_status;
+        $patient_invoice->title = $request->note;
+        $patient_invoice->amount = BedType::find($request->bed_id)->charge;
+        $patient_invoice->save();
+        //
+        $ipd_patient->save();
+        return redirect('/_doctor/ipd_patient')->with('success', 'Ipd-Patient In Updated Successfully');
+    }
+
+    public function delete_ipd_patient($id)
+    {
+        $ipd_patient = IpdPatient::find($id);
+        $ipd_patient->delete();
+        return redirect('/_doctor/ipd_patient')->with('success', 'Ipd-Patient In Deleted Successfully');
     }
 }
