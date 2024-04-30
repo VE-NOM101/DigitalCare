@@ -11,6 +11,7 @@ use App\Http\Controllers\PdfGenerator;
 use App\Http\Controllers\PharmacistController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\SMSController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SslCommerzPaymentController;
 use App\Models\Doctor;
@@ -120,6 +121,16 @@ Route::group(['prefix' => '_admin', 'middleware' => ['web', 'isAdmin']], functio
     //Book ambulance
     Route::get('/book_ambulance',[AdminController::class,'book_ambulance']);
     Route::get('/show_map/{id}',[AdminController::class,'show_map']);
+    Route::get('/confirm_ambulance/{id}',[AdminController::class,'confirm_ambulance']);
+    Route::post('/confirm_ambulance/{id}',[AdminController::class,'post_confirm_ambulance']);
+    
+    //Ambulance
+    Route::get('/ambulance',[AdminController::class,'ambulance']);
+    Route::post('/add_ambulance',[AdminController::class,'add_ambulance']);
+    Route::get('/edit_ambulance/{id}',[AdminController::class,'edit_ambulance']);
+    Route::post('/edit_ambulance/{id}',[AdminController::class,'post_edit_ambulance']);
+    Route::get('/delete_ambulance/{id}',[AdminController::class,'delete_ambulance']);
+    Route::get('/release_ambulance/{id}',[AdminController::class,'release_ambulance']);
 
 });
 
@@ -253,3 +264,6 @@ Route::post('/ipn', [SslCommerzPaymentController::class, 'ipn']);
 
 Route::get('/book_ambulance/',[FrontEndController::class,'book_ambulance']);
 Route::post('/book_ambulance/',[FrontEndController::class,'post_book_ambulance']);
+
+
+Route::get('/sms',[SMSController::class,'send']);

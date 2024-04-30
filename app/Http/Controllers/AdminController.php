@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ambulance;
 use App\Models\ApprovedAppointment;
 use App\Models\BedType;
 use App\Models\Block;
@@ -19,7 +20,8 @@ use App\Models\RequestedAppointment;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
-
+use sms_net_bd\SMS;
+use Exception;
 class AdminController extends Controller
 {
     //Users
@@ -483,20 +485,21 @@ class AdminController extends Controller
         $ipd_patient->bed_id = $request->bed_id;
         $ipd_patient->admission_date = $request->admission_date;
         $ipd_patient->note = $request->note;
-         //
-         $patient_invoice = PatientInvoice::find($ipd_patient->invoice_id);
-         $patient_invoice->doctor_id = $request->doctor_id;
-         $patient_invoice->payment_method = $request->payment_method;
-         $patient_invoice->status = $request->bill_status;
-         $patient_invoice->title = $request->note;
-         $patient_invoice->amount = BedType::find($request->bed_id)->charge;
-         $patient_invoice->save();
-         //
+        //
+        $patient_invoice = PatientInvoice::find($ipd_patient->invoice_id);
+        $patient_invoice->doctor_id = $request->doctor_id;
+        $patient_invoice->payment_method = $request->payment_method;
+        $patient_invoice->status = $request->bill_status;
+        $patient_invoice->title = $request->note;
+        $patient_invoice->amount = BedType::find($request->bed_id)->charge;
+        $patient_invoice->save();
+        //
         $ipd_patient->save();
         return redirect('/_admin/ipd_patient')->with('success', 'Ipd-Patient In Updated Successfully');
     }
 
-    public function delete_ipd_patient($id){
+    public function delete_ipd_patient($id)
+    {
         $ipd_patient = IpdPatient::find($id);
         $ipd_patient->delete();
         return redirect('/_admin/ipd_patient')->with('success', 'Ipd-Patient In Deleted Successfully');
@@ -504,14 +507,150 @@ class AdminController extends Controller
 
     //book ambulance
 
-    public function book_ambulance(){
+    public function book_ambulance()
+    {
         $data['getBookAmbulance'] = BookAmbulance::all();
-        
-        return view('control.admin.book_ambulance',$data);
+
+        return view('control.admin.book_ambulance', $data);
     }
-    public function show_map($id){
+    public function show_map($id)
+    {
         $data['getMap'] = BookAmbulance::find($id);
-        
-        return view('control.admin.show_map',$data);
+
+        return view('control.admin.show_map', $data);
     }
+
+    public function confirm_ambulance($id){
+        $data['getAmb'] = Ambulance::where('isBooked',0)->get();
+        $data['getBookAmb'] = $id;
+        return view('control.admin.confirm_ambulance',$data);
+    }
+
+    public function post_confirm_ambulance($booked_id, Request $request){
+        $ambulance = Ambulance::find($request->amb_id);
+        $book_ambulance = BookAmbulance::find($booked_id);
+        $book_ambulance->status = 'done';
+        $ambulance->isBooked=1;
+        
+
+
+        //sms send api
+         // Create an instance of the class
+         $sms = new SMS();
+
+         try {
+             // Send Single SMS
+             $response = $sms->sendSMS(
+                 "Location->".' City: '.$book_ambulance->city . ',Latitude: ' .$book_ambulance->lat
+                 . ',Longitude: '.$book_ambulance->lon .',Phone: '.$book_ambulance->phone .',Name: '.$book_ambulance->name,
+                 $ambulance->contact
+             );
+             if($response){
+                $book_ambulance->save();
+                $ambulance->save();
+                return redirect('/_admin/book_ambulance')->with('success','Booked and Message sent');
+             }else{
+                return redirect('/_admin/book_ambulance')->with('error','Failed');
+             }
+         } catch (Exception $e) {
+             // handle $e->getMessage();
+             return redirect('/_admin/book_ambulance')->with('error','Failed//'.$e->getMessage());
+         }
+
+        
+    }
+
+    //Ambulance
+    public function ambulance()
+    {
+        $data['getAmb'] = Ambulance::all();
+        return view('control.admin.ambulance', $data);
+    }
+
+    public function add_ambulance(Request $request)
+    {
+        $request->validate([
+            'reg_no' => 'required',
+            'driver' => 'required',
+            'contact' => 'required',
+            'photo_path' => 'required|mimes:png,jpg,jpeg,bmp',
+        ]);
+
+        $imageName = '';
+        if ($image = $request->file('photo_path')) {
+            $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
+            //into public folder
+            $image->move('digitalcare/admin/ambulance', $imageName);
+        }
+
+        $ambulance = new Ambulance;
+        $ambulance->driver = $request->input('driver');
+        $ambulance->photo_path = $imageName;
+        $ambulance->contact = $request->input('contact');
+        $ambulance->reg_no = $request->input('reg_no');
+        $ambulance->save();
+        return redirect('/_admin/ambulance')->with('success', 'Ambulance added successfully');
+    }
+
+    public function edit_ambulance($id)
+    {
+        $data['getAmb'] = Ambulance::find($id);
+        return view('control.admin.edit_ambulance', $data);
+    }
+
+    public function post_edit_ambulance($id, Request $request)
+    {
+
+        $ambulance = Ambulance::find($id);
+
+        $request->validate([
+            'reg_no' => 'required',
+            'driver' => 'required',
+            'contact' => 'required',
+        ]);
+
+        $imageName = '';
+        $deleteOldImage = 'digitalcare/admin/ambulance/' . $ambulance->photo_path;
+
+        if ($image = $request->file('photo_path')) {
+            if (file_exists($deleteOldImage)) {
+                File::delete($deleteOldImage);
+            }
+            $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
+            //into public folder
+            $image->move('digitalcare/admin/ambulance', $imageName);
+        } else {
+            $imageName = $ambulance->photo_path;
+        }
+
+        $ambulance->driver = $request->input('driver');
+        $ambulance->photo_path = $imageName;
+        $ambulance->contact = $request->input('contact');
+        $ambulance->reg_no = $request->input('reg_no');
+        $ambulance->save();
+        return redirect('/_admin/ambulance')->with('success', 'Ambulance Updated successfully');
+    }
+
+    public function delete_ambulance($id)
+    {
+        $ambulance = Ambulance::find($id);
+        $deleteOldImage = 'digitalcare/admin/ambulance/' . $ambulance->photo_path;
+        if (file_exists($deleteOldImage)) {
+            File::delete($deleteOldImage);
+        }
+        $ambulance->delete();
+
+        return redirect('/_admin/ambulance')->with('error', 'Ambulance Deleted successfully');
+    }
+
+    public function release_ambulance($id){
+
+        $ambulance = Ambulance::find($id);
+        $ambulance->isBooked = 0;
+        $ambulance->save();
+        
+        return redirect('/_admin/ambulance')->with('success', 'Ambulance Released successfully');
+    }
+
+
 }

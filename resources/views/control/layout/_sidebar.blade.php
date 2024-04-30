@@ -61,6 +61,13 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'ambulance') @else collapsed @endif"
+                    href="{{ url('/_admin/ambulance') }}">
+                    <i class="fas fa-pump-medical"></i>
+                    <span>Ambulance</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link @if (Request::segment(2) == 'book_ambulance') @else collapsed @endif"
                     href="{{ url('/_admin/book_ambulance') }}">
                     <i class="fas fa-ambulance"></i>

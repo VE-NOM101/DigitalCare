@@ -105,7 +105,7 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label class="control-label" for="phone">City</label>
-                                        <input id="city" name="city" type="text" placeholder="City"
+                                        <input id="city" name="city" type="text" placeholder="Leave empty for current address"
                                             class="form-control input-md">
                                     </div>
                                 </div>

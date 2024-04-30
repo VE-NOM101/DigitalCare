@@ -14,6 +14,7 @@
                             <th>Name</th>
                             <th>Phone</th>
                             <th>City</th>
+                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -24,13 +25,26 @@
                                 <td>{{ $item->name }}</td>
                                 <td> <span class="badge bg-secondary">{{ $item->phone }}</span></td>
                                 <td>{{ $item->city }}</td>
-
                                 <td>
-                                    <button class="btn btn-outline-info" onclick="showMap({{ $item->lat }}, {{ $item->lon }})"><i class="fas fa-map-marker-alt"> </i>Show
+                                    @if ($item->status == 'done')
+                                        <span class="badge bg-success">Done</span>
+                                    @else<span class="badge bg-danger">Undone</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <button class="btn btn-outline-info"
+                                        onclick="showMap({{ $item->lat }}, {{ $item->lon }})"><i
+                                            class="fas fa-map-marker-alt"> </i>Show
                                         Map</button>
-                                    <a href="{{ url('_admin/confirm_ambulance/' . $item->id) }}"
-                                        class="btn btn-outline-success"><i class="fas fa-clipboard-check">
-                                        </i>Confirm</a>
+                                    @if ($item->status == 'undone')
+                                        <a href="{{ url('_admin/confirm_ambulance/' . $item->id) }}"
+                                            class="btn btn-outline-success"><i class="fas fa-clipboard-check">
+                                            </i>Confirm</a>
+                                    @else
+                                        <i class="fas fa-clipboard-check btn btn-outline-primary">Done
+                                        </i>
+                                    @endif
+
                                 </td>
                             </tr>
                         @endforeach
