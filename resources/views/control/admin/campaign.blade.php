@@ -76,7 +76,7 @@
                                                 </form>
                                             </td>
 
-                                            <td><a class="btn btn-outline-success">Publish<span><i class="far fa-paper-plane"></i></span></a></td>
+                                            <td><a class="btn btn-outline-success" href="{{url('_admin/publish_campaign/'.$item->id)}}">Publish<span><i class="far fa-paper-plane"></i></span></a></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
