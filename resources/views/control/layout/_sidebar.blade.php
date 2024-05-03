@@ -75,6 +75,13 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'campaign') @else collapsed @endif"
+                    href="{{ url('/_admin/campaign') }}">
+                    <i class="fas fa-calendar-day"></i>
+                    <span>Campaign</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link @if (Request::segment(2) == 'doctors') @else collapsed @endif"
                     href="{{ url('/_admin/doctors') }}">
                     <i class="bi bi-person-fill-check"></i>

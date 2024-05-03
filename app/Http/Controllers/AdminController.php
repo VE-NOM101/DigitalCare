@@ -7,6 +7,7 @@ use App\Models\ApprovedAppointment;
 use App\Models\BedType;
 use App\Models\Block;
 use App\Models\BookAmbulance;
+use App\Models\Campaign;
 use App\Models\DaySchedule;
 use App\Models\Department;
 use App\Models\Doctor;
@@ -22,6 +23,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\File;
 use sms_net_bd\SMS;
 use Exception;
+
 class AdminController extends Controller
 {
     //Users
@@ -520,44 +522,44 @@ class AdminController extends Controller
         return view('control.admin.show_map', $data);
     }
 
-    public function confirm_ambulance($id){
-        $data['getAmb'] = Ambulance::where('isBooked',0)->get();
+    public function confirm_ambulance($id)
+    {
+        $data['getAmb'] = Ambulance::where('isBooked', 0)->get();
         $data['getBookAmb'] = $id;
-        return view('control.admin.confirm_ambulance',$data);
+        return view('control.admin.confirm_ambulance', $data);
     }
 
-    public function post_confirm_ambulance($booked_id, Request $request){
+    public function post_confirm_ambulance($booked_id, Request $request)
+    {
         $ambulance = Ambulance::find($request->amb_id);
         $book_ambulance = BookAmbulance::find($booked_id);
         $book_ambulance->status = 'done';
-        $ambulance->isBooked=1;
-        
+        $ambulance->isBooked = 1;
+
 
 
         //sms send api
-         // Create an instance of the class
-         $sms = new SMS();
+        // Create an instance of the class
+        $sms = new SMS();
 
-         try {
-             // Send Single SMS
-             $response = $sms->sendSMS(
-                 "Location->".' City: '.$book_ambulance->city . ',Latitude: ' .$book_ambulance->lat
-                 . ',Longitude: '.$book_ambulance->lon .',Phone: '.$book_ambulance->phone .',Name: '.$book_ambulance->name,
-                 $ambulance->contact
-             );
-             if($response){
+        try {
+            // Send Single SMS
+            $response = $sms->sendSMS(
+                "Location->" . ' City: ' . $book_ambulance->city . ',Latitude: ' . $book_ambulance->lat
+                    . ',Longitude: ' . $book_ambulance->lon . ',Phone: ' . $book_ambulance->phone . ',Name: ' . $book_ambulance->name,
+                $ambulance->contact
+            );
+            if ($response) {
                 $book_ambulance->save();
                 $ambulance->save();
-                return redirect('/_admin/book_ambulance')->with('success','Booked and Message sent');
-             }else{
-                return redirect('/_admin/book_ambulance')->with('error','Failed');
-             }
-         } catch (Exception $e) {
-             // handle $e->getMessage();
-             return redirect('/_admin/book_ambulance')->with('error','Failed//'.$e->getMessage());
-         }
-
-        
+                return redirect('/_admin/book_ambulance')->with('success', 'Booked and Message sent');
+            } else {
+                return redirect('/_admin/book_ambulance')->with('error', 'Failed');
+            }
+        } catch (Exception $e) {
+            // handle $e->getMessage();
+            return redirect('/_admin/book_ambulance')->with('error', 'Failed//' . $e->getMessage());
+        }
     }
 
     //Ambulance
@@ -643,14 +645,65 @@ class AdminController extends Controller
         return redirect('/_admin/ambulance')->with('error', 'Ambulance Deleted successfully');
     }
 
-    public function release_ambulance($id){
+    public function release_ambulance($id)
+    {
 
         $ambulance = Ambulance::find($id);
         $ambulance->isBooked = 0;
         $ambulance->save();
-        
+
         return redirect('/_admin/ambulance')->with('success', 'Ambulance Released successfully');
     }
 
 
+    public function campaign()
+    {
+        $data['getCampaign'] = Campaign::all()->sortDesc();
+        return view('control.admin.campaign',$data);
+    }
+
+    public function add_campaign(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'place' => 'required',
+            'from_date' => 'required',
+            'to_date' => 'required',
+            'time' => 'required',
+            'description' => 'required',
+            'photo_path' => 'required|mimes:png,jpg,jpeg,bmp',
+        ]);
+
+        $imageName = '';
+        if ($image = $request->file('photo_path')) {
+            $imageName = time() . '-' . uniqid() . '.' . $image->getClientOriginalExtension();
+            //into public folder
+            $image->move('digitalcare/admin/campaign', $imageName);
+        }
+
+        $campaign = new Campaign;
+        $campaign->name = $request->input('name');
+        $campaign->photo_path = $imageName;
+        $campaign->place = $request->input('place');
+        $campaign->from_date = $request->input('from_date');
+        $campaign->to_date = $request->input('to_date');
+        $campaign->time = $request->input('time');
+        $campaign->description = $request->input('description');
+        if ($request->input('isActive')) {
+            $campaign->isActive = $request->input('isActive');
+        }
+        $campaign->type = $request->input('type');
+        $campaign->reg_fee = $request->input('reg_fee');
+        $campaign->form_link = $request->input('form_link');
+        $campaign->save();
+        return redirect('/_admin/campaign')->with('success', 'Campaign added successfully');
+    }
+
+    public function toggle_campaign($id,Request $request){
+        $campaign = Campaign::find($id);
+        if($request->status=='on') $campaign->isActive=1;
+        else $campaign->isActive=0;
+        $campaign->save();
+        return redirect('/_admin/campaign')->with('success', 'Updated');
+    }
 }

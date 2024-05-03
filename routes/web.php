@@ -132,6 +132,11 @@ Route::group(['prefix' => '_admin', 'middleware' => ['web', 'isAdmin']], functio
     Route::get('/delete_ambulance/{id}',[AdminController::class,'delete_ambulance']);
     Route::get('/release_ambulance/{id}',[AdminController::class,'release_ambulance']);
 
+    //Campaign 
+    Route::get('/campaign',[AdminController::class,'campaign']);
+    Route::post('/add_campaign',[AdminController::class,'add_campaign']);
+    Route::post('/toggle_campaign/{id}',[AdminController::class,'toggle_campaign']);
+
 });
 
 //Pharmacist
@@ -265,5 +270,5 @@ Route::post('/ipn', [SslCommerzPaymentController::class, 'ipn']);
 Route::get('/book_ambulance/',[FrontEndController::class,'book_ambulance']);
 Route::post('/book_ambulance/',[FrontEndController::class,'post_book_ambulance']);
 
-
+//SMS Controlling 
 Route::get('/sms',[SMSController::class,'send']);
