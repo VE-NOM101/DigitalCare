@@ -8,6 +8,7 @@ use App\Models\BedType;
 use App\Models\Block;
 use App\Models\BookAmbulance;
 use App\Models\Campaign;
+use App\Models\CampaignMessage;
 use App\Models\DaySchedule;
 use App\Models\Department;
 use App\Models\Doctor;
@@ -705,5 +706,27 @@ class AdminController extends Controller
         else $campaign->isActive=0;
         $campaign->save();
         return redirect('/_admin/campaign')->with('success', 'Updated');
+    }
+
+    public function publish_campaign($id){
+        $users = User::all();
+        $campaign = Campaign::find($id);
+        foreach ($users as $user) {
+            $user->notification = 0;
+            $user->save();
+        }
+        if(CampaignMessage::all()->count()>0){
+            $msg = CampaignMessage::find(1);
+            $msg->message="Good news!, New Campaign has been launched-> ".$campaign->name;
+            $msg->form_link= $campaign->form_link;
+            $msg->save();
+        }else{
+            $msg = new CampaignMessage();
+            $msg->message="Good news!, New Campaign has been launched-> ".$campaign->name;
+            $msg->form_link= $campaign->form_link;
+            $msg->save();
+        }
+        
+        return redirect('/_admin/campaign')->with('success', 'Published');
     }
 }

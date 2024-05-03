@@ -63,8 +63,8 @@
                             <a class="new-btn-d br-2" href="/register"><span>Sign Up</span></a>
                         @endif
 
-                        <div class="p-2"><a href="{{url('/book_ambulance/')}}" class="btn btn-danger"><i class="fa fa-ambulance"
-                                    aria-hidden="true"></i>Emergency Ambulance</a>
+                        <div class="p-2"><a href="{{ url('/book_ambulance/') }}" class="btn btn-danger"><i
+                                    class="fa fa-ambulance" aria-hidden="true"></i>Emergency Ambulance</a>
                         </div>
                     </div>
                 </div>
@@ -85,7 +85,7 @@
         </div>
     </div>
     <!-- End top bar -->
-
+    @include('auth.info')
     <!-- Start header -->
     <header class="top-header">
         <nav class="navbar header-nav navbar-expand-lg">
@@ -107,7 +107,7 @@
                         <li><a class="nav-link" href="#departments">Departments</a></li>
                         <li><a class="nav-link" href="#gallery">Gallery</a></li>
                         <li><a class="nav-link" href="#team">Doctor</a></li>
-                        <li><a class="nav-link" href="#blog">Blog</a></li>
+                        <li><a class="nav-link" href="#blog">Campaign</a></li>
                         <li><a class="nav-link" href="#contact">Contact</a></li>
                     </ul>
                 </div>
@@ -674,68 +674,39 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="title-box">
-                        <h2>Blog</h2>
+                        <h2>Campaign</h2>
                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. </p>
                     </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <div class="blog-inner">
-                        <div class="blog-img">
-                            <img class="img-fluid" src="{{ config('app.url') }}/Frontend/images/blog-img-01.jpg"
-                                alt="" />
+                @foreach ($getCampaign as $item)
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="blog-inner">
+                            <div class="blog-img">
+                                <img class="img-fluid" src="{{asset('digitalcare/admin/campaign/'.$item->photo_path) }}"
+                                    alt="" />
+                            </div>
+                            <div class="item-meta">
+                                @if($item->type=="free") <span class="badge bg-success">Free</span>
+                                @else <span class="badge bg-warning">Paid</span>
+                                <span class="badge bg-danger">{{$item->reg_fee}} Tk</span>
+                                @endif
+                                <a href="#"><i class="fa fa-user-o"></i> Admin</a>
+                                <span class="dti">{{ \Carbon\Carbon::parse($item->from_date)->format('d-M-Y') }} -
+                                    {{ \Carbon\Carbon::parse($item->to_date)->format('d-M-Y') }} At {{ \Carbon\Carbon::parse($item->time)->format('H:i A') }}</span>
+                            </div>
+                            <h2>{{$item->name}}</h2>
+                            <p style="height: 200px; overflow-y: auto;">{{ $item->description }}</p>
+
+                            <a class="new-btn-d br-2" href="{{$item->form_link}}">Register Now <i class="fa fa-angle-double-right"
+                                    aria-hidden="true"></i></a>
                         </div>
-                        <div class="item-meta">
-                            <a href="#"><i class="fa fa-comments-o"></i> 5 Comment </a>
-                            <a href="#"><i class="fa fa-user-o"></i> Admin</a>
-                            <span class="dti">25 July 2018</span>
-                        </div>
-                        <h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</h2>
-                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
-                            been the industry's standard </p>
-                        <a class="new-btn-d br-2" href="#">Read More <i class="fa fa-angle-double-right"
-                                aria-hidden="true"></i></a>
                     </div>
-                </div>
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <div class="blog-inner">
-                        <div class="blog-img">
-                            <img class="img-fluid" src="{{ config('app.url') }}/Frontend/images/blog-img-02.jpg"
-                                alt="" />
-                        </div>
-                        <div class="item-meta">
-                            <a href="#"><i class="fa fa-comments-o"></i> 5 Comment </a>
-                            <a href="#"><i class="fa fa-user-o"></i> Admin</a>
-                            <span class="dti">25 July 2018</span>
-                        </div>
-                        <h2>Proin vel sem ut lorem rhoncus lacinia. </h2>
-                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
-                            been the industry's standard </p>
-                        <a class="new-btn-d br-2" href="#">Read More <i class="fa fa-angle-double-right"
-                                aria-hidden="true"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <div class="blog-inner">
-                        <div class="blog-img">
-                            <img class="img-fluid" src="{{ config('app.url') }}/Frontend/images/blog-img-03.jpg"
-                                alt="" />
-                        </div>
-                        <div class="item-meta">
-                            <a href="#"><i class="fa fa-comments-o"></i> 5 Comment </a>
-                            <a href="#"><i class="fa fa-user-o"></i> Admin</a>
-                            <span class="dti">25 July 2018</span>
-                        </div>
-                        <h2>Aliquam egestas magna a malesuada rutrum. </h2>
-                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
-                            been the industry's standard </p>
-                        <a class="new-btn-d br-2" href="#">Read More <i class="fa fa-angle-double-right"
-                                aria-hidden="true"></i></a>
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
+    </div>
     </div>
     <!-- End Blog -->
 

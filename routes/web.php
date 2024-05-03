@@ -34,7 +34,7 @@ Route::get('/', function () {
 
 Route::get('/backRoute', [AuthController::class, 'loadLogin']);
 
-Route::get('/index', [FrontEndController::class, 'index']);
+Route::get('/index', [FrontEndController::class, 'index'])->name('index');
 
 
 //login-logout
@@ -136,6 +136,7 @@ Route::group(['prefix' => '_admin', 'middleware' => ['web', 'isAdmin']], functio
     Route::get('/campaign',[AdminController::class,'campaign']);
     Route::post('/add_campaign',[AdminController::class,'add_campaign']);
     Route::post('/toggle_campaign/{id}',[AdminController::class,'toggle_campaign']);
+    Route::get('/publish_campaign/{id}',[AdminController::class,'publish_campaign']);
 
 });
 
