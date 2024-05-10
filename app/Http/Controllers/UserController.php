@@ -10,6 +10,7 @@ use App\Models\NurseAppointment;
 use App\Models\Patient;
 use App\Models\PatientInvoice;
 use App\Models\Prescription;
+use App\Models\ReqLiveConsultation;
 use App\Models\RequestedAppointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -55,7 +56,7 @@ class UserController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        
+
         $appointment->name = Auth::user()->name;
         $appointment->email = Auth::user()->email;
         $appointment->phone = $request->input('phone');
@@ -69,19 +70,21 @@ class UserController extends Controller
     }
 
 
-    public function appointments(){
-        $data['getRA'] = RequestedAppointment::where('user_id',Auth::user()->id)->get();
+    public function appointments()
+    {
+        $data['getRA'] = RequestedAppointment::where('user_id', Auth::user()->id)->get();
         $data['getDoctor'] = Doctor::all();
         $data['getAA'] = ApprovedAppointment::all();
         $data['getNA'] = NurseAppointment::all();
         $data['getNurse'] = Nurse::all();
-      
-        return view('control.user.appointments',$data);
+
+        return view('control.user.appointments', $data);
     }
-    public function resend_appointment($id){
+    public function resend_appointment($id)
+    {
         $data['getRA'] = RequestedAppointment::find($id);
         $data['getDoctor'] = Doctor::all();
-        return view('control.user.resend_appointment',$data);
+        return view('control.user.resend_appointment', $data);
     }
 
     public function post_resend_appointment(Request $request)
@@ -110,7 +113,7 @@ class UserController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        
+
         $appointment->name = $request->input('name');
         $appointment->email = $request->input('email');
         $appointment->phone = $request->input('phone');
@@ -123,21 +126,24 @@ class UserController extends Controller
         return redirect('/_user/appointments')->with('success', 'Appointment resend successfully');
     }
 
-    public function patient_profile(){
-    //     $doctor_id = Doctor::where('user_id', Auth::user()->id)->first()->id;
-        $data['getPatient'] = Patient::where('user_id',Auth::user()->id)->first();
+    public function patient_profile()
+    {
+        //     $doctor_id = Doctor::where('user_id', Auth::user()->id)->first()->id;
+        $data['getPatient'] = Patient::where('user_id', Auth::user()->id)->first();
         $data['getAppointment'] = RequestedAppointment::where('user_id', Auth::user()->id)->get();
         $data['getDoctor'] = Doctor::all();
         $data['getApproved'] = ApprovedAppointment::all();
-        return view('control.user.patient_profile',$data);
+        return view('control.user.patient_profile', $data);
     }
-    public function add_profile_picture($id){
-        $data['id'] =$id;
+    public function add_profile_picture($id)
+    {
+        $data['id'] = $id;
         $data['getPatient'] = Patient::find($id);
-        return view('control.user.add_profile_picture',$data);
+        return view('control.user.add_profile_picture', $data);
     }
 
-    public function post_add_profile_picture($id, Request $request){
+    public function post_add_profile_picture($id, Request $request)
+    {
         $patient = Patient::find($id);
         $request->validate([
             'photo_path' => 'required|mimes:png,jpg,jpeg,bmp',
@@ -163,7 +169,7 @@ class UserController extends Controller
 
     public function prescription()
     {
-        $patient = Patient::where('user_id',Auth::user()->id)->first();
+        $patient = Patient::where('user_id', Auth::user()->id)->first();
 
         $data['getPrescription'] = Prescription::where('patient_id', $patient->id)->get();
         $data['getPatient'] = Patient::all();
@@ -183,19 +189,51 @@ class UserController extends Controller
         $data['getMedicine'] = $data['getPrescription']->medicines()->get();
         return view('control.user.view_prescription', $data);
     }
-    
-    public function view_invoice($id){
+
+    public function view_invoice($id)
+    {
         $data['getInvoice'] = PatientInvoice::find($id);
         $data['getDoctor'] = Doctor::find($data['getInvoice']->doctor_id);
         $data['getPatient'] = Patient::find($data['getInvoice']->patient_id);
         $data['getRA'] = RequestedAppointment::find($data['getInvoice']->req_appointment_id);
-        return view('control.user.view_invoice',$data);
+        return view('control.user.view_invoice', $data);
     }
-    public function my_invoice(){
+    public function my_invoice()
+    {
         $patient_id = Patient::where('user_id', Auth::user()->id)->first()->id;
-        $data['getPatientInvoices'] = PatientInvoice::where('patient_id',$patient_id)->get();
+        $data['getPatientInvoices'] = PatientInvoice::where('patient_id', $patient_id)->get();
         $data['getDoctor'] = Doctor::all();
         $data['getRA'] = RequestedAppointment::all();
         return view('control.user.my_invoice', $data);
+    }
+
+
+    public function live_consultation()
+    {
+        $data['getDoctor'] = Doctor::all();
+        $data['getLiveToday'] = ReqLiveConsultation::where('user_id', Auth::user()->id)->where('date', Carbon::today())->where('status', 1)->get();
+        $data['getLive'] = ReqLiveConsultation::where('user_id', Auth::user()->id)->get();
+        return view('control.user.live_consultation', $data);
+    }
+
+    public function req_live_consultation(Request $request)
+    {
+        $request->validate([
+            'doctor_id' => 'required',
+            'description' => 'required',
+            'date' => 'required',
+        ]);
+        $req_live = new ReqLiveConsultation();
+        $req_live->user_id = Auth::user()->id;
+        $req_live->doctor_id = $request->doctor_id;
+        $req_live->description = $request->description;
+        $req_live->date = $request->date;
+        $req_live->save();
+        return redirect('/_user/live_consultation')->with('success', 'Requested');
+    }
+
+    public function goto_live($id){
+        $data['getLink'] = ReqLiveConsultation::find($id)->link;
+        return view('control.doctor.goto_live',$data);
     }
 }
