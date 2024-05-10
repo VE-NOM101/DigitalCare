@@ -14,6 +14,7 @@ use App\Models\Nurse;
 use App\Models\Patient;
 use App\Models\PatientInvoice;
 use App\Models\Prescription;
+use App\Models\ReqLiveConsultation;
 use App\Models\RequestedAppointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -774,5 +775,47 @@ class DoctorController extends Controller
         $ipd_patient = IpdPatient::find($id);
         $ipd_patient->delete();
         return redirect('/_doctor/ipd_patient')->with('success', 'Ipd-Patient In Deleted Successfully');
+    }
+
+    //Live Consultation
+    public function live_consultation(){
+        $data['getDoctor'] = Doctor::where('user_id',Auth::user()->id)->first();
+        $data['getUser'] = User::all();
+        $data['getLive'] = ReqLiveConsultation::where('doctor_id',$data['getDoctor']->id)->where('status',0)->get();
+        $data['getLiveAll'] = ReqLiveConsultation::where('doctor_id',$data['getDoctor']->id)->get();
+        $data['getLiveToday'] = ReqLiveConsultation::where('doctor_id',$data['getDoctor']->id)->where('date',Carbon::today())->where('status',1)->get();
+        return view('control.doctor.live_consultation',$data);
+    }
+
+
+    public function confirm_consultation($id){
+        $req_live = ReqLiveConsultation::find($id);
+        $req_live->status=1;
+
+        $req_live->save();
+        return redirect('/_doctor/live_consultation')->with('success', 'Confirmed');
+    }
+
+    public function share_room($id){
+        $data['getId'] = $id;
+        return view('control.doctor.share_room',$data);
+    }
+
+    public function post_share_room($id, Request $request){
+        $req_live = ReqLiveConsultation::find($id);
+        $req_live->link = $request->link.'_'.Auth::user()->name;
+        $req_live->save();
+        return redirect('/_doctor/live_consultation')->with('success', 'Shared');
+    }
+    public function goto_live($id){
+        $data['getLink'] = ReqLiveConsultation::find($id)->link;
+        return view('control.doctor.goto_live',$data);
+    }
+
+    public function done_consultation($id){
+        $req_live = ReqLiveConsultation::find($id);
+        $req_live->status = 2;
+        $req_live->save();
+        return redirect('/_doctor/live_consultation')->with('success', 'Done');
     }
 }

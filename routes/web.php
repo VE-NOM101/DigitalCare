@@ -226,6 +226,14 @@ Route::group(['prefix' => '_doctor', 'middleware' => ['web', 'isDoctor']], funct
     Route::get('/edit_ipd_patient/{id}',[DoctorController::class,'edit_ipd_patient']);
     Route::post('/edit_ipd_patient/{id}',[DoctorController::class,'post_edit_ipd_patient']);
     Route::get('/delete_ipd_patient/{id}',[DoctorController::class,'delete_ipd_patient']);
+
+    //Live Consulation
+    Route::get('/live_consultation',[DoctorController::class,'live_consultation']);
+    Route::get('/confirm_consultation/{id}',[DoctorController::class,'confirm_consultation']);
+    Route::get('/share_room/{id}',[DoctorController::class,'share_room']);
+    Route::post('/share_room/{id}',[DoctorController::class,'post_share_room']);
+    Route::get('/goto_live/{id}',[DoctorController::class,'goto_live']);
+    Route::get('/done_consultation/{id}',[DoctorController::class,'done_consultation']);
     
 });
 //Nurse
@@ -257,6 +265,12 @@ Route::group(['prefix' => '_user', 'middleware' => ['web', 'isUser']], function 
 
     Route::get('/my_invoice',[UserController::class,'my_invoice']);
     Route::get('/view_invoice/{id}',[UserController::class,'view_invoice']);
+
+    //Live Consultation
+    Route::get('/live_consultation',[UserController::class,'live_consultation']);
+    Route::post('/req_live_consultation',[UserController::class,'req_live_consultation']);
+
+    Route::get('/goto_live/{id}',[UserController::class,'goto_live']);
 });
 
 // SSLCOMMERZ Start

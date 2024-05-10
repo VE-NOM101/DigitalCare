@@ -183,6 +183,13 @@
             </li>
             {{-- End invoices --}}
             <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'live_consultation') @else collapsed @endif"
+                    href="{{ url('/_doctor/live_consultation') }}">
+                    <i class="fas fa-video"></i>
+                    <span>Live Consultation</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link @if (Request::segment(2) == 'profile') @else collapsed @endif"
                     href="{{ url('/_doctor/profile') }}">
                     <i class="bi bi-person"></i>
@@ -230,6 +237,13 @@
                     href="{{ url('/_user/my_invoice') }}">
                     <i class="bi bi-receipt-cutoff"></i>
                     <span>My Invoices</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @if (Request::segment(2) == 'live_consultation') @else collapsed @endif"
+                    href="{{ url('/_user/live_consultation') }}">
+                    <i class="fas fa-video"></i>
+                    <span>Live Consultation</span>
                 </a>
             </li>
         @endif
